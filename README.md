@@ -96,20 +96,8 @@ Após a conclusão da configuração, você pode executar as avaliações.
 Você pode executar os testes de Sentar e Alcançar e de Coçar as Costas sequencialmente usando o script de execução fornecido.
 
 ```bash
-python runner.py
+python runner_2.py
 ```
-
-### Executando Testes Individuais
-Você também pode executar cada script de teste individualmente:
-
-* **Para o Teste de Sentar e Alcançar**:
-    ```bash
-    python ./Sit-and-Reach/sit_and_reach_holistic_2.py
-    ```
-* **Para o Teste de Coçar as Costas**:
-    ```bash
-    python ./Back-Scratch/back_scratch.py
-    ```
 
 ### O Processo
 1.  Quando um script é iniciado, uma janela aparecerá solicitando as informações do usuário (Idade, Altura, Peso, Gênero). Preencha os campos e pressione `Enter`.
@@ -119,24 +107,7 @@ Você também pode executar cada script de teste individualmente:
 5.  O sistema detectará automaticamente quando você estiver na postura correta, manterá a pose e, em seguida, calculará o resultado.
 6.  O resultado será exibido, e você será solicitado a continuar (`c`) ou sair (`q`).
 
-## 📁 Estrutura do Projeto
 
-```
-.
-├── /analises/              # Scripts e resultados para análise estatística dos dados.
-├── /Back-Scratch/          # Contém o script Python para o teste de Coçar as Costas.
-├── /CsRunner/              # Um projeto em C# .NET para executar os scripts Python.
-├── /relatorios/            # Relatórios de progresso e finais detalhados.
-├── /Sit-and-Reach/         # Contém scripts Python para o teste de Sentar e Alcançar.
-├── /tabelas_testes/        # Planilhas de dados de teste.
-├── /tabelas_utentes/       # Planilhas com dados coletados dos testes com usuários.
-├── .gitignore              # Especifica arquivos a serem ignorados pelo Git.
-├── runner.py               # Um script Python simples para executar todos os testes.
-└── README.md               # Este arquivo.
-```
-
-
-## 🙏 Agradecimentos
 
 * Este trabalho faz parte de uma colaboração de pesquisa entre o **Instituto Politécnico de Beja (IPBeja)** e o **Instituto Federal de Santa Catarina (IFSC)**.
 * Este projeto contribui para o projeto mais amplo **CAPACITA**, que visa desenvolver ferramentas digitais para avaliar e melhorar as capacidades físicas da população idosa.
