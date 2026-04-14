@@ -5,11 +5,11 @@
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.x-blue.svg)](https://opencv.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Um sistema inovador para a avaliação automatizada de testes de aptidão física da Bateria de Fullerton, projetado para apoiar o envelhecimento ativo. Este projeto utiliza visão computacional com um sensor Kinect V2 e a biblioteca MediaPipe Holistic do Google para fornecer medições precisas e em tempo real.
+O sistema original para a avaliação automatizada de testes de aptidão física da Bateria de Fullerton, projetado para apoiar o envelhecimento ativo. Este projeto utiliza visão computacional com um sensor Kinect V2 e a biblioteca MediaPipe Holistic do Google para fornecer medições precisas e em tempo real.
 
 ## 📋 Sobre o Projeto
 
-Este projeto, desenvolvido como parte da colaboração **PROPICIE - IPBEJA & IFSC** e contribuindo para a iniciativa **CAPACITA**, visa automatizar a avaliação da aptidão física de idosos. Ao automatizar os testes da Bateria de Testes Funcionais de Fullerton, podemos coletar dados objetivos sobre flexibilidade e força, o que é crucial para monitorar o declínio físico e promover programas de envelhecimento ativo personalizados.
+Sendo o original: https://github.com/vgguerra/Propicie
 
 O sistema foca em duas avaliações principais:
 * **Teste de Sentar e Alcançar** (`Sentado e alcançar os pés com as mãos`): Mede a flexibilidade dos membros inferiores.
@@ -17,11 +17,7 @@ O sistema foca em duas avaliações principais:
 
 O núcleo do projeto é uma aplicação em Python que utiliza um sensor Kinect V2 para capturar os movimentos do usuário e o framework MediaPipe Holistic para realizar a detecção de marcos corporais em tempo real. Essa abordagem permite o cálculo preciso dos ângulos corporais para validação da postura e das distâncias-chave para a pontuação dos testes.
 
-### 📊 Principais Descobertas
-A pesquisa conduzida por Artem Bukhantsev e aprofundada por mim concluiu que:
-* A implementação com **MediaPipe** demonstrou uma precisão superior para o teste de Sentar e Alcançar, com um Erro Médio Absoluto (MAE) de aproximadamente **2.25 cm**.
-* Esta abordagem foi significativamente mais precisa do que uma implementação nativa com PyKinect, que apresentou um MAE de 8.65 cm, devido a desafios como a instabilidade do esqueleto virtual ("jittering").
-* O teste de "Coçar as Costas" provou ser um desafio para a visão computacional devido à oclusão de membros e à orientação do usuário de costas para a câmera.
+**Foram adicionados visuais para facilitar seu uso tando para quem administrar os testes e quem está o realizando.**
 
 ## ✨ Funcionalidades
 
