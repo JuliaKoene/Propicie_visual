@@ -30,6 +30,10 @@ CALIBRATION_HELD_DURATION = 3
 POSE_HELD_DURATION        = 3
 AVERAGE_OVER              = 6
 
+# Screen resolution constants
+SCREEN_WIDTH  = 1920
+SCREEN_HEIGHT = 1080
+
 C_PANEL   = (255,  255,  255)
 C_ACCENT  = (0,  210, 255)
 C_SUCCESS = (0,  220, 100)
@@ -305,12 +309,41 @@ def check_posture(pose_correct_start_time, knee_angle, opposite_knee_angle, hip_
 #  RESULT / INPUT SCREENS  (styled v2 versions)
 # ═════════════════════════════════════════════════════════════════
 
-def final_visualization(left, right):
-    lines = [
-        (f"Best result of the right leg: {right} cm", C_SUCCESS),
-        (f"Best result of the left leg : {left}  cm", C_SUCCESS),
-    ]
-    img = _base_screen("Exercise Completed", lines, 'Press  "Q"  to finish')
+def final_visualization(left_system, right_system, left_real, right_real):
+    cv2.namedWindow("Final Results")
+    img = np.ones((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8) * 255
+    cv2.rectangle(img, (0, 0), (SCREEN_WIDTH, 8), C_ACCENT, -1)
+    
+    # Title
+    (tw, _), _ = cv2.getTextSize("Exercise Completed", cv2.FONT_HERSHEY_DUPLEX, 2.5, 3)
+    cv2.putText(img, "Exercise Completed", (SCREEN_WIDTH // 2 - tw // 2, 120),
+                cv2.FONT_HERSHEY_DUPLEX, 2.5, (0, 0, 0), 3, cv2.LINE_AA)
+    cv2.line(img, (100, 160), (SCREEN_WIDTH - 100, 160), C_ACCENT, 2)
+    
+    start_y = 260
+    line_height = 90
+    
+    # System section header
+    cv2.putText(img, "SYSTEM MEASUREMENTS:", (150, start_y),
+                cv2.FONT_HERSHEY_DUPLEX, 1.5, C_ACCENT, 2, cv2.LINE_AA)
+    cv2.putText(img, f"Best result of the right leg: {right_system} cm", (200, start_y + line_height),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.4, C_SUCCESS, 2, cv2.LINE_AA)
+    cv2.putText(img, f"Best result of the left leg: {left_system} cm", (200, start_y + 2 * line_height),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.4, C_SUCCESS, 2, cv2.LINE_AA)
+    
+    # Real section header
+    cv2.putText(img, "REAL MEASUREMENTS:", (150, start_y + 3 * line_height + 40),
+                cv2.FONT_HERSHEY_DUPLEX, 1.5, C_YELLOW, 2, cv2.LINE_AA)
+    cv2.putText(img, f"Best result of the right leg: {right_real} cm", (200, start_y + 4 * line_height + 40),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.4, C_SUCCESS, 2, cv2.LINE_AA)
+    cv2.putText(img, f"Best result of the left leg: {left_real} cm", (200, start_y + 5 * line_height + 40),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.4, C_SUCCESS, 2, cv2.LINE_AA)
+    
+    # Instructions
+    (pw, _), _ = cv2.getTextSize('Press  "Q"  to finish', cv2.FONT_HERSHEY_SIMPLEX, 1.2, 2)
+    cv2.putText(img, 'Press  "Q"  to finish', (SCREEN_WIDTH // 2 - pw // 2, SCREEN_HEIGHT - 100),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 2, cv2.LINE_AA)
+    
     cv2.imshow("Final Results", img)
     while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -319,13 +352,35 @@ def final_visualization(left, right):
 
 def final_repetition_visualization(final_distance, real_distance,
                                    exercise_label, side_label, rep_num):
-    lines = [
-        (f"Final Distance : {final_distance} cm",     C_SUCCESS),
-        (f"Real Distance  : {real_distance} cm",      C_ACCENT),
-        (f"{exercise_label}  |  Side: {side_label}  |  Rep {rep_num}", C_GREY),
-    ]
-    img = _base_screen("Repetition Completed", lines,
-                       'Press  "C"  to continue  |  "Q"  to quit')
+    cv2.namedWindow("Final Repetition Results")
+    img = np.ones((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8) * 255
+    cv2.rectangle(img, (0, 0), (SCREEN_WIDTH, 8), C_ACCENT, -1)
+    
+    # Title
+    (tw, _), _ = cv2.getTextSize("Repetition Completed", cv2.FONT_HERSHEY_DUPLEX, 2.5, 3)
+    cv2.putText(img, "Repetition Completed", (SCREEN_WIDTH // 2 - tw // 2, 120),
+                cv2.FONT_HERSHEY_DUPLEX, 2.5, (0, 0, 0), 3, cv2.LINE_AA)
+    cv2.line(img, (100, 160), (SCREEN_WIDTH - 100, 160), C_ACCENT, 2)
+    
+    start_y = 320
+    line_height = 120
+    
+    # Results
+    cv2.putText(img, f"Final Distance (System): {final_distance} cm", (200, start_y),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.5, C_SUCCESS, 2, cv2.LINE_AA)
+    cv2.putText(img, f"Real Distance (Measured): {real_distance} cm", (200, start_y + line_height),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.5, C_ACCENT, 2, cv2.LINE_AA)
+    
+    # Exercise info
+    info_text = f"{exercise_label}  |  Side: {side_label}  |  Rep {rep_num}"
+    cv2.putText(img, info_text, (200, start_y + 2 * line_height),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.3, C_GREY, 2, cv2.LINE_AA)
+    
+    # Instructions
+    (pw, _), _ = cv2.getTextSize('Press  "C"  to continue  |  "Q"  to quit', cv2.FONT_HERSHEY_SIMPLEX, 1.2, 2)
+    cv2.putText(img, 'Press  "C"  to continue  |  "Q"  to quit', (SCREEN_WIDTH // 2 - pw // 2, SCREEN_HEIGHT - 100),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 2, cv2.LINE_AA)
+    
     cv2.imshow("Final Repetition Results", img)
     while True:
         key = cv2.waitKey(1) & 0xFF
@@ -348,8 +403,8 @@ def register():
                 if x1 <= x <= x2 and y1 <= y <= y2:
                     active_field = i; break
 
-    cv2.namedWindow("Cadastro")
-    cv2.setMouseCallback("Cadastro", mouse_callback)
+    cv2.namedWindow("CAPACITA Project - Cadastro")
+    cv2.setMouseCallback("CAPACITA Project - Cadastro", mouse_callback)
     while True:
         img = 255 * np.ones((400, 600, 3), dtype=np.uint8)
         for i, (x1, y1, x2, y2) in enumerate(positions):
@@ -363,7 +418,7 @@ def register():
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
         cv2.putText(img, "Aperte Enter para finalizar", (50, 380),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 100), 1)
-        cv2.imshow("Cadastro", img)
+        cv2.imshow("CAPACITA Project - Cadastro", img)
         key = cv2.waitKey(10) & 0xFF
         if key == 27:   finish_program()
         elif key in (13, 10): cv2.destroyAllWindows(); return values
@@ -400,6 +455,8 @@ def real_distance():
 def process_exercise(repeats):
     side_label = "Right" if repeats in [0, 1] else "Left"
     rep_num    = (repeats % 2) + 1
+
+    cv2.namedWindow('CAPACITA Project - Exercise')
 
     # ── original state variables (unchanged) ──
     pose_correct_start_time = None
@@ -489,6 +546,8 @@ def process_exercise(repeats):
 
 distances_right = []
 distances_left  = []
+real_distances_right = []
+real_distances_left  = []
 
 repeats = 0
 age, height, weight, gender = register()
@@ -516,9 +575,11 @@ while repeats < 4:
 
         if repeats in [0, 1]:
             distances_right.append(final_distance)
+            real_distances_right.append(real)
             side = "right"
         else:
             distances_left.append(final_distance)
+            real_distances_left.append(real)
             side = "left"
 
         with open("./logs_utentes/logs_sit_and_reach_utentes", "a") as arquivo:
@@ -531,12 +592,14 @@ while repeats < 4:
         print("Exercise not performed correctly")
         finish_program()
 
-best_left = min(distances_left, key=lambda x: abs(float(x)))
-best_right = min(distances_right, key=lambda x: abs(float(x)))
+best_left_system = min(distances_left, key=lambda x: abs(float(x)))
+best_right_system = min(distances_right, key=lambda x: abs(float(x)))
+best_left_real = min(real_distances_left, key=lambda x: abs(float(x)))
+best_right_real = min(real_distances_right, key=lambda x: abs(float(x)))
 
 # emit results for runner BEFORE opening final window
-print(f"SAR_RIGHT={best_right}")
-print(f"SAR_LEFT={best_left}")
+print(f"SAR_RIGHT={best_right_system}")
+print(f"SAR_LEFT={best_left_system}")
 sys.stdout.flush()
 
-final_visualization(best_left, best_right)
+final_visualization(best_left_system, best_right_system, best_left_real, best_right_real)

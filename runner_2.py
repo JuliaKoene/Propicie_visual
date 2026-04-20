@@ -27,8 +27,12 @@ C_WHITE   = (255, 255, 255)
 C_GREY    = (140, 140, 160)
 C_YELLOW  = (0,  230, 230)
 
+# Screen resolution constants
+SCREEN_WIDTH  = 1920
+SCREEN_HEIGHT = 1080
 
-def _gradient_bg(h=600, w=900):
+
+def _gradient_bg(h=SCREEN_HEIGHT, w=SCREEN_WIDTH):
     img = np.ones((h,w,3), dtype=np.uint8) * 255
     return img
 #  INTRO SCREEN
@@ -38,35 +42,35 @@ def intro_screen():
         ("2","Back Scratch", "Right Side x2  ->  Left Side x2",  C_YELLOW),
     ]
     cv2.namedWindow("Assessment Protocol", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Assessment Protocol", 900, 600)
-    cv2.moveWindow("Assessment Protocol", 500, 200)
+    cv2.setWindowProperty("Assessment Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     for frame_idx in range(9999):   # loop until keypress
         img = _gradient_bg()
-        cv2.rectangle(img,(0,0),(900,6),C_ACCENT,-1)
-        cv2.putText(img,"Fitness Assessment  v2.0",(60,65),
-                    cv2.FONT_HERSHEY_DUPLEX,1.3,(0,0,0),2,cv2.LINE_AA)
-        cv2.line(img,(60,82),(840,82),C_ACCENT,1)
-        cv2.putText(img,"Exercise sequence for this session:",(60,120),
-                    cv2.FONT_HERSHEY_SIMPLEX,0.75,C_GREY,1,cv2.LINE_AA)
+        cv2.rectangle(img,(0,0),(SCREEN_WIDTH,8),C_ACCENT,-1)
+        (tw, _), _ = cv2.getTextSize("Fitness Assessment  v2.0", cv2.FONT_HERSHEY_DUPLEX, 2.0, 3)
+        cv2.putText(img,"Fitness Assessment  v2.0",((SCREEN_WIDTH-tw)//2,120),
+                    cv2.FONT_HERSHEY_DUPLEX,2.0,(0,0,0),3,cv2.LINE_AA)
+        cv2.line(img,(100,160),(SCREEN_WIDTH-100,160),C_ACCENT,2)
+        cv2.putText(img,"Exercise sequence for this session:",(150,220),
+                    cv2.FONT_HERSHEY_SIMPLEX,1.2,C_GREY,2,cv2.LINE_AA)
 
         for i,(num,name,detail,col) in enumerate(steps):
-            cy = 170 + i*140
+            cy = 350 + i*300
             ov = img.copy()
-            cv2.rectangle(ov,(55,cy-10),(845,cy+105),(35,35,55),-1)
+            cv2.rectangle(ov,(100,cy-20),(SCREEN_WIDTH-100,cy+180),(35,35,55),-1)
             cv2.addWeighted(ov,0.85,img,0.15,0,img)
-            cv2.rectangle(img,(55,cy-10),(65,cy+105),col,-1)
-            cv2.circle(img,(105,cy+45),28,col,-1)
-            cv2.putText(img,num,(97,cy+54),cv2.FONT_HERSHEY_DUPLEX,1.1,(255,255,255),2,cv2.LINE_AA)
-            cv2.putText(img,name,(150,cy+38),cv2.FONT_HERSHEY_DUPLEX,1.0,(255,255,255),2,cv2.LINE_AA)
-            cv2.putText(img,detail,(150,cy+80),cv2.FONT_HERSHEY_SIMPLEX,0.72,col,1,cv2.LINE_AA)
+            cv2.rectangle(img,(100,cy-20),(120,cy+180),col,-1)
+            cv2.circle(img,(180,cy+80),50,col,-1)
+            cv2.putText(img,num,(160,cy+100),cv2.FONT_HERSHEY_DUPLEX,2.0,(255,255,255),3,cv2.LINE_AA)
+            cv2.putText(img,name,(280,cy+70),cv2.FONT_HERSHEY_DUPLEX,1.8,(255,255,255),3,cv2.LINE_AA)
+            cv2.putText(img,detail,(280,cy+130),cv2.FONT_HERSHEY_SIMPLEX,1.3,col,2,cv2.LINE_AA)
 
         alpha = 0.5+0.5*abs(np.sin(frame_idx*0.08))
         prompt = 'Press  SPACE  to begin  |  ESC  to exit'
         ov2 = img.copy()
-        (pw,_),_ = cv2.getTextSize(prompt,cv2.FONT_HERSHEY_SIMPLEX,0.8,2)
-        cv2.putText(ov2,prompt,(900//2-pw//2,548),
-                    cv2.FONT_HERSHEY_SIMPLEX,0.8,C_SUCCESS,2,cv2.LINE_AA)
+        (pw,_),_ = cv2.getTextSize(prompt,cv2.FONT_HERSHEY_SIMPLEX,1.2,2)
+        cv2.putText(ov2,prompt,(SCREEN_WIDTH//2-pw//2,SCREEN_HEIGHT-100),
+                    cv2.FONT_HERSHEY_SIMPLEX,1.2,C_SUCCESS,2,cv2.LINE_AA)
         cv2.addWeighted(ov2,alpha,img,1-alpha,0,img)
 
         cv2.imshow("Assessment Protocol",img)
@@ -78,14 +82,15 @@ def intro_screen():
 #  FINALE
 def grand_finale(sar_right, sar_left, bs_right, bs_left):
     cv2.namedWindow("Assessment Complete", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Assessment Complete", 900, 600)
-    cv2.moveWindow("Assessment Complete", 500, 200)
+    cv2.setWindowProperty("Assessment Complete", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    
     while True:
         img = _gradient_bg()
-        cv2.rectangle(img,(0,0),(900,6),C_SUCCESS,-1)
-        cv2.putText(img,"Assessment Complete!",(180,68),
-                    cv2.FONT_HERSHEY_DUPLEX,1.4,(0,0,0),2,cv2.LINE_AA)
-        cv2.line(img,(60,88),(840,88),C_SUCCESS,1)
+        cv2.rectangle(img,(0,0),(SCREEN_WIDTH,8),C_SUCCESS,-1)
+        (tw, _), _ = cv2.getTextSize("Assessment Complete!", cv2.FONT_HERSHEY_DUPLEX, 2.5, 3)
+        cv2.putText(img,"Assessment Complete!",((SCREEN_WIDTH-tw)//2,140),
+                    cv2.FONT_HERSHEY_DUPLEX,2.5,(0,0,0),3,cv2.LINE_AA)
+        cv2.line(img,(100,180),(SCREEN_WIDTH-100,180),C_SUCCESS,2)
 
         sections = [
             ("Sit and Reach",[
@@ -98,19 +103,19 @@ def grand_finale(sar_right, sar_left, bs_right, bs_left):
             ]),
         ]
         for si,(title,rows) in enumerate(sections):
-            base_y=140+si*190
+            base_y=300+si*350
             col = C_ACCENT if si==0 else C_YELLOW
-            cv2.putText(img,title,(70,base_y),cv2.FONT_HERSHEY_DUPLEX,1.0,col,2,cv2.LINE_AA)
-            cv2.line(img,(70,base_y+10),(500,base_y+10),C_GREY,1)
+            cv2.putText(img,title,(200,base_y),cv2.FONT_HERSHEY_DUPLEX,1.8,col,3,cv2.LINE_AA)
+            cv2.line(img,(200,base_y+30),(800,base_y+30),C_GREY,2)
             for ri,(text,c) in enumerate(rows):
-                cv2.putText(img,text,(90,base_y+55+ri*50),
-                            cv2.FONT_HERSHEY_SIMPLEX,0.9,c,2,cv2.LINE_AA)
+                cv2.putText(img,text,(300,base_y+100+ri*80),
+                            cv2.FONT_HERSHEY_SIMPLEX,1.5,c,2,cv2.LINE_AA)
 
-        cv2.line(img,(60,530),(840,530),C_GREY,1)
+        cv2.line(img,(100,SCREEN_HEIGHT-200),(SCREEN_WIDTH-100,SCREEN_HEIGHT-200),C_GREY,2)
         prompt='Press  "Q"  to exit'
-        (pw,_),_=cv2.getTextSize(prompt,cv2.FONT_HERSHEY_SIMPLEX,0.8,1)
-        cv2.putText(img,prompt,(900//2-pw//2,570),
-                    cv2.FONT_HERSHEY_SIMPLEX,0.8,C_YELLOW,1,cv2.LINE_AA)
+        (pw,_),_=cv2.getTextSize(prompt,cv2.FONT_HERSHEY_SIMPLEX,1.3,2)
+        cv2.putText(img,prompt,(SCREEN_WIDTH//2-pw//2,SCREEN_HEIGHT-100),
+                    cv2.FONT_HERSHEY_SIMPLEX,1.3,C_YELLOW,2,cv2.LINE_AA)
         cv2.imshow("Assessment Complete",img)
         if cv2.waitKey(1)&0xFF==ord('q'):
             cv2.destroyAllWindows(); break
