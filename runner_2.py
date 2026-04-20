@@ -41,8 +41,8 @@ def intro_screen():
         ("1","Sit and Reach","Right Leg  x2  ->  Left Leg  x2",  C_ACCENT),
         ("2","Back Scratch", "Right Side x2  ->  Left Side x2",  C_YELLOW),
     ]
-    cv2.namedWindow("Assessment Protocol", cv2.WINDOW_NORMAL)
-    cv2.setWindowProperty("Assessment Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cv2.namedWindow("CAPACITA Project - Assessment Protocol", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("CAPACITA Project - Assessment Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     for frame_idx in range(9999):   # loop until keypress
         img = _gradient_bg()
@@ -73,17 +73,18 @@ def intro_screen():
                     cv2.FONT_HERSHEY_SIMPLEX,1.2,C_SUCCESS,2,cv2.LINE_AA)
         cv2.addWeighted(ov2,alpha,img,1-alpha,0,img)
 
-        cv2.imshow("Assessment Protocol",img)
+        cv2.imshow("CAPACITA Project - Assessment Protocol",img)
         key=cv2.waitKey(30)&0xFF
         if key==32:
-            cv2.destroyWindow("Assessment Protocol"); return
+            cv2.destroyWindow("CAPACITA Project - Assessment Protocol"); return
         elif key==27:
             cv2.destroyAllWindows(); sys.exit(0)
+
 #  FINALE
 def grand_finale(sar_right, sar_left, bs_right, bs_left):
-    cv2.namedWindow("Assessment Complete", cv2.WINDOW_NORMAL)
-    cv2.setWindowProperty("Assessment Complete", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    
+    cv2.namedWindow("CAPACITA Project - Assessment Complete", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("CAPACITA Project - Assessment Complete", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
     while True:
         img = _gradient_bg()
         cv2.rectangle(img,(0,0),(SCREEN_WIDTH,8),C_SUCCESS,-1)

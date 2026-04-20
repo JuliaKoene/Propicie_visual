@@ -352,7 +352,7 @@ def final_visualization(left_system, right_system, left_real, right_real):
 
 def final_repetition_visualization(final_distance, real_distance,
                                    exercise_label, side_label, rep_num):
-    cv2.namedWindow("Final Repetition Results")
+    cv2.namedWindow("CAPACITA Project - Final Repetition Results")
     img = np.ones((SCREEN_HEIGHT, SCREEN_WIDTH, 3), dtype=np.uint8) * 255
     cv2.rectangle(img, (0, 0), (SCREEN_WIDTH, 8), C_ACCENT, -1)
     
@@ -381,11 +381,11 @@ def final_repetition_visualization(final_distance, real_distance,
     cv2.putText(img, 'Press  "C"  to continue  |  "Q"  to quit', (SCREEN_WIDTH // 2 - pw // 2, SCREEN_HEIGHT - 100),
                 cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 2, cv2.LINE_AA)
     
-    cv2.imshow("Final Repetition Results", img)
+    cv2.imshow("CAPACITA Project - Final Repetition Results", img)
     while True:
         key = cv2.waitKey(1) & 0xFF
         if key == ord('c'):
-            cv2.destroyWindow("Final Repetition Results"); break
+            cv2.destroyWindow("CAPACITA Project - Final Repetition Results"); break
         elif key == ord('q'):
             finish_program()
 
