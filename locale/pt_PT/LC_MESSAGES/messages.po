@@ -1,0 +1,221 @@
+# Portuguese (Portugal) translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-04-20 16:52+0100\n"
+"PO-Revision-Date: 2026-04-20 16:26+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt_PT\n"
+"Language-Team: pt_PT <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:668
+#: Sit-and-Reach/sit_and_reach_julia.py:726 runner_2.py:117 runner_2.py:198
+#: runner_2.py:282 runner_2.py:285
+msgid "Sit and Reach"
+msgstr "Sentar e Alcançar"
+
+#: runner_2.py:117
+msgid "Right Leg  x2  ->  Left Leg  x2"
+msgstr "Perna direita x2 -> Perna esquerda x2"
+
+#: runner_2.py:118 runner_2.py:202 runner_2.py:289 runner_2.py:292
+msgid "Back Scratch"
+msgstr "Coçar as costas"
+
+#: runner_2.py:118
+msgid "Right Side x2  ->  Left Side x2"
+msgstr "Lado direito x2 -> Lado esquerdo x2"
+
+#: runner_2.py:129
+msgid "Fitness Assessment  v2.0"
+msgstr "Bateria de exercícios v2.0"
+
+#: runner_2.py:135
+msgid "Exercise sequence for this session:"
+msgstr "Sequência de exercícios para esta sessão:"
+
+#: runner_2.py:159
+msgid "Press  SPACE  to begin  |  ESC  to exit"
+msgstr "Prima a barra de espaço para iniciar | Prima Esc para saíres"
+
+#: runner_2.py:192 runner_2.py:298
+msgid "Assessment complete"
+msgstr "Bateria completa"
+
+#: runner_2.py:224
+msgid "Press  \"Q\"  to exit"
+msgstr "Prima Q para saíres"
+
+#: runner_2.py:282 runner_2.py:289
+msgid "Starting"
+msgstr "A iniciar"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:593
+#: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
+msgid "Right"
+msgstr "Direita"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:593
+#: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
+msgid "Left"
+msgstr "Esquerda"
+
+#: runner_2.py:298
+msgid "All data saved"
+msgstr "Dados salvos"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:206
+msgid "CALIBRATION STATUS"
+msgstr "ESTADO DA CALIBRAÇÃO"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:213
+msgid "Adjust your posture"
+msgstr "Ajusta a tua postura"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:214
+msgid "Hold still to calibrate"
+msgstr "Calibrando. Não te movas..."
+
+#: Sit-and-Reach/sit_and_reach_julia.py:215
+msgid "Calibrated — start the exercise"
+msgstr "Calibrado — executa o exercício"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:481
+msgid "Exercise Completed"
+msgstr "Exercício completo"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:482
+msgid "Press  \"Q\"  to finish"
+msgstr "Prima Q para finalizares"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:483
+msgid "Final Results"
+msgstr "Resultados finais"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:497
+msgid "Repetition Completed"
+msgstr "Repetição completa"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:498
+msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
+msgstr "Prima C para prosseguir | Prima Q para saíres"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:499
+#: Sit-and-Reach/sit_and_reach_julia.py:503
+msgid "Final Repetition Results"
+msgstr "Resultados finais da repetição"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:511
+msgid "Age"
+msgstr "Idade"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:512
+msgid "Height (cm)"
+msgstr "Altura (cm)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:513
+msgid "Weight (kg)"
+msgstr "Peso (kg)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:514
+msgid "Gender (M/F)"
+msgstr "Gênero (M/F)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:528
+msgid "Registration"
+msgstr "Registro"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:543
+#: Sit-and-Reach/sit_and_reach_julia.py:572
+msgid "Press Enter to confirm"
+msgstr "Prima Enter para submeter"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:562
+msgid "Real Distance"
+msgstr "Distância pela medição automática"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:568
+msgid "Enter the measured distance (cm):"
+msgstr "Informa a distância pela medição manual (cm)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:691
+msgid "Feminine"
+msgstr "Feminino"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:691
+msgid "Male"
+msgstr "Masculino"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:729
+msgid "Exercise not performed correctly"
+msgstr "Exercício não efetuado corretamente"
+
+msgid "Wrong Position"
+msgstr "Posição errada"
+
+msgid "Right Position"
+msgstr "Posição correta"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Side"
+msgstr "Lado"
+
+msgid "Rep"
+msgstr "Rep"
+
+msgid "Opposite Knee Angle"
+msgstr "Ângulo do joelho oposto"
+
+msgid "Opposite Elbow Angle"
+msgstr "Ângulo do cotovelo oposto"
+
+msgid "Knee Angle"
+msgstr "Ângulo do joelho"
+
+msgid "Hip Angle"
+msgstr "Ângulo do quadril"
+
+msgid "Elbow Angle"
+msgstr "Ângulo do cotovelo"
+
+msgid "Best result of the right leg"
+msgstr "Melhor resultado da perna direita"
+
+msgid "Best result of the left leg"
+msgstr "Melhor resultado da perna esquerda"
+
+msgid "Final Distance"
+msgstr "Distância final"
+
+msgid "Real Distance"
+msgstr "Distância real"
+
+msgid "Incorrect"
+msgstr "Incorreta"
+
+msgid "Foot position X/Y"
+msgstr "Coordenadas do pé X/Y"
+
+msgid "Hand position X/Y"
+msgstr "Coordenadas da mão X/Y"
+
+msgid "Dist"
+msgstr "Dist"
+
+msgid "Pose"
+msgstr "Pose"
+
+msgid "Calibration"
+msgstr "Calibração"
