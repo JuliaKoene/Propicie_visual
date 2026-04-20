@@ -62,7 +62,6 @@ def draw_header(img, exercise_label, side_label, rep_num, total_reps):
     cv2.putText(img, rep_text, (w - tw2 - 20, 46),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.8, C_WHITE, 2, cv2.LINE_AA)
 
-
 def draw_calibration_legend(img, calib_status):
     """
     Bottom-left panel — three rows for the three calibration states.
@@ -120,7 +119,6 @@ def draw_calibration_legend(img, calib_status):
 def _gradient_bg(h=500, w=900):
     img = np.ones((h, w, 3), dtype=np.uint8) * 255
     return img
-
 
 def _base_screen(title_text, lines, prompt):
     img = _gradient_bg()
@@ -303,7 +301,6 @@ def check_posture(pose_correct_start_time, knee_angle, opposite_knee_angle, hip_
         return "Correct", min(progress, 1.0), pose_correct_start_time, None
     return "Incorrect", 0.0, None, None
 
-
 # ═════════════════════════════════════════════════════════════════
 #  RESULT / INPUT SCREENS  (styled v2 versions)
 # ═════════════════════════════════════════════════════════════════
@@ -395,7 +392,6 @@ def real_distance():
             if distancia: cv2.destroyAllWindows(); return float(distancia.replace(",", "."))
         elif key == 8:  distancia = distancia[:-1]
         elif (key >= 48 and key <= 57) or key in [44, 46, 43, 45]: distancia += chr(key)
-
 
 # ═════════════════════════════════════════════════════════════════
 #  MAIN EXERCISE LOOP  — original logic + v2 overlays on top

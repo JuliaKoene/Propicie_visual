@@ -17,9 +17,8 @@ import cv2
 import time
 import os
 
-# ─────────────────────────────────────────────
+
 #  COLOUR PALETTE  (BGR)
-# ─────────────────────────────────────────────
 C_BG      = (255,  255,  255)
 C_ACCENT  = (0,  210, 255)
 C_SUCCESS = (0,  220, 100)
@@ -32,12 +31,7 @@ C_YELLOW  = (0,  230, 230)
 def _gradient_bg(h=600, w=900):
     img = np.ones((h,w,3), dtype=np.uint8) * 255
     return img
-
-
-# ══════════════════════════════════════════════
 #  INTRO SCREEN
-# ══════════════════════════════════════════════
-
 def intro_screen():
     steps = [
         ("1","Sit and Reach","Right Leg  x2  ->  Left Leg  x2",  C_ACCENT),
@@ -81,12 +75,7 @@ def intro_screen():
             cv2.destroyWindow("Assessment Protocol"); return
         elif key==27:
             cv2.destroyAllWindows(); sys.exit(0)
-
-
-# ══════════════════════════════════════════════
-#  GRAND FINALE
-# ══════════════════════════════════════════════
-
+#  FINALE
 def grand_finale(sar_right, sar_left, bs_right, bs_left):
     cv2.namedWindow("Assessment Complete", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Assessment Complete", 900, 600)
@@ -125,12 +114,7 @@ def grand_finale(sar_right, sar_left, bs_right, bs_left):
         cv2.imshow("Assessment Complete",img)
         if cv2.waitKey(1)&0xFF==ord('q'):
             cv2.destroyAllWindows(); break
-
-
-# ══════════════════════════════════════════════
 #  SUBPROCESS RUNNER — reads stdout line by line
-# ══════════════════════════════════════════════
-
 def run_and_collect(script_path, keys):
     """
     Run script_path as a subprocess.
@@ -157,12 +141,7 @@ def run_and_collect(script_path, keys):
                 results[k] = m.group(1).strip()
     proc.wait()
     return results
-
-
-# ══════════════════════════════════════════════
 #  MAIN
-# ══════════════════════════════════════════════
-
 if __name__ == "__main__":
 
     # Resolve paths relative to this file's location
