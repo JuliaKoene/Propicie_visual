@@ -258,3 +258,9 @@ msgstr "Pos mão direita"
 
 msgid "Pos Left Hand"
 msgstr "Pos mão esquerda"
+
+msgid "Correct"
+msgstr "Correta"
+
+msgid "Incorrect"
+msgstr "Incorreta"

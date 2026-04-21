@@ -262,3 +262,9 @@ msgstr "Pos Right Hand"
 
 msgid "Pos Left Hand"
 msgstr "Pos Left Hand"
+
+msgid "Correct"
+msgstr "Correct"
+
+msgid "Incorrect"
+msgstr "Incorrect"
