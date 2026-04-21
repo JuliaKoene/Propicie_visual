@@ -219,3 +219,42 @@ msgstr "Pose"
 
 msgid "Calibration"
 msgstr "Calibração"
+
+msgid "Not Detected"
+msgstr "Não detetado"
+
+msgid "Detected"
+msgstr "Detetado"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Position both hands in view"
+msgstr "Coloca ambas as mãos na vista"
+
+msgid "Move hands closer together"
+msgstr "Aproxima as mãos uma da outra"
+
+msgid "Hold position to measure"
+msgstr "Mantém a posição para medir"
+
+msgid "Distance between both hands"
+msgstr "Distância entre as mãos"
+
+msgid "Best result of the right side"
+msgstr "Melhor resultado do lado direito"
+
+msgid "Best result of the left side"
+msgstr "Melhor resultado do lado esquerdo"
+
+msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
+msgstr "Prima C para prosseguir | Prima Q para saíres"
+
+msgid "Press Enter to finish"
+msgstr "Prima Enter para terminar"
+
+msgid "Pos Right Hand"
+msgstr "Pos mão direita"
+
+msgid "Pos Left Hand"
+msgstr "Pos mão esquerda"
