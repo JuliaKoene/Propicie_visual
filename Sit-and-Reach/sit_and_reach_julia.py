@@ -749,7 +749,7 @@ while repeats < 4:
     final_distance = process_exercise(repeats)
 
     if final_distance is not None:
-        caminho_arquivo = "D:/CAPACITA/Propicie_visual/tabelas_utentes/sit_and_reach_2_utentes.xlsx"
+        caminho_arquivo = "./tabelas_utentes/sit_and_reach_2_utentes.xlsx"
         df   = pd.read_excel(caminho_arquivo, engine="openpyxl")
         real = real_distance()
 
@@ -770,7 +770,7 @@ while repeats < 4:
             side = "left"
 
         # Usa fmt_datetime() para o timestamp localizado
-        with open("D:/CAPACITA/Propicie_visual/logs_utentes/logs_sit_and_reach_utentes", "a",
+        with open("./logs_utentes/logs_sit_and_reach_utentes", "a",
                   encoding="utf-8") as arquivo:
             arquivo.write(f"{fmt_datetime()}, {age}, {height}, {weight}, "
                           f"{gender}, {real}, {final_distance}, {side}\n")

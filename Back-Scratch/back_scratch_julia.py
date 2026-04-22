@@ -492,7 +492,7 @@ while repeats < 4:
         real = real_distance()
         erro = np.abs(np.abs(float(real)) - np.abs(float(final_distance)))
 
-        caminho_arquivo = "D:/CAPACITA/Propicie_visual/tabelas_utentes/back_scratch_utentes.xlsx"
+        caminho_arquivo = "./tabelas_utentes/back_scratch_utentes.xlsx"
         df = pd.read_excel(caminho_arquivo, engine="openpyxl")
 
         new_line = {
@@ -509,7 +509,7 @@ while repeats < 4:
             distances_left.append(final_distance)
             side = "left"
 
-        with open("D:/CAPACITA/Propicie_visual/logs_utentes/logs_back_scratch_utentes", "a") as arquivo:
+        with open("./logs_utentes/logs_back_scratch_utentes", "a") as arquivo:
             arquivo.write(f"{dt.datetime.now()}, {age}, {height}, {weight}, "
                           f"{gender}, {real}, {final_distance}, {side}\n")
 
