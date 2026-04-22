@@ -16,7 +16,7 @@ import numpy as np
 import cv2
 import time
 import os
-
+from PIL import ImageFont, ImageDraw, Image
 
 #  COLOUR PALETTE  (BGR)
 C_BG      = (255,  255,  255)
@@ -27,13 +27,19 @@ C_WHITE   = (255, 255, 255)
 C_GREY    = (140, 140, 160)
 C_YELLOW  = (0,  230, 230)
 
+#  NEW COLOUR PALETTE  (BGR)
+LIGHT = (255, 241, 241)
+RED = (161, 30, 44)
+
 # Screen resolution constants
 SCREEN_WIDTH  = 1920
 SCREEN_HEIGHT = 1080
 
-
-def _gradient_bg(h=SCREEN_HEIGHT, w=SCREEN_WIDTH):
-    img = np.ones((h,w,3), dtype=np.uint8) * 255
+def _bg(h=SCREEN_HEIGHT, w=SCREEN_WIDTH):
+    img = np.ones((h,w,3), dtype=np.uint8)
+    img[:, :, 0] = 241  
+    img[:, :, 1] = 241  
+    img[:, :, 2] = 255  
     return img
 #  INTRO SCREEN
 def intro_screen():
@@ -45,14 +51,14 @@ def intro_screen():
     cv2.setWindowProperty("CAPACITA Project - Assessment Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     for frame_idx in range(9999):   # loop until keypress
-        img = _gradient_bg()
-        cv2.rectangle(img,(0,0),(SCREEN_WIDTH,8),C_ACCENT,-1)
-        (tw, _), _ = cv2.getTextSize("Fitness Assessment  v2.0", cv2.FONT_HERSHEY_DUPLEX, 2.0, 3)
-        cv2.putText(img,"Fitness Assessment  v2.0",((SCREEN_WIDTH-tw)//2,120),
-                    cv2.FONT_HERSHEY_DUPLEX,2.0,(0,0,0),3,cv2.LINE_AA)
+        img = _bg()
+        cv2.rectangle(img,(10,200),(1500,10), RED, -500)
+
+        (tw, _), _ = cv2.getTextSize("BATERIA DE EXERCÍCIOS", cv2.FONT_HERSHEY_COMPLEX, 2.0, 3)
+
+        cv2.putText(img,"BATERIA DE EXERCÍCIOS",((SCREEN_WIDTH-tw)//2,120), cv2.FONT_HERSHEY_COMPLEX,2.0,(0,0,0),3,cv2.LINE_AA)
         cv2.line(img,(100,160),(SCREEN_WIDTH-100,160),C_ACCENT,2)
-        cv2.putText(img,"Exercise sequence for this session:",(150,220),
-                    cv2.FONT_HERSHEY_SIMPLEX,1.2,C_GREY,2,cv2.LINE_AA)
+        cv2.putText(img,"Exercise sequence for this session:",(150,220), cv2.FONT_HERSHEY_SIMPLEX,1.2,C_GREY,2,cv2.LINE_AA)
 
         for i,(num,name,detail,col) in enumerate(steps):
             cy = 350 + i*300
@@ -69,8 +75,7 @@ def intro_screen():
         prompt = 'Press  SPACE  to begin  |  ESC  to exit'
         ov2 = img.copy()
         (pw,_),_ = cv2.getTextSize(prompt,cv2.FONT_HERSHEY_SIMPLEX,1.2,2)
-        cv2.putText(ov2,prompt,(SCREEN_WIDTH//2-pw//2,SCREEN_HEIGHT-100),
-                    cv2.FONT_HERSHEY_SIMPLEX,1.2,C_SUCCESS,2,cv2.LINE_AA)
+        cv2.putText(ov2,prompt,(SCREEN_WIDTH//2-pw//2,SCREEN_HEIGHT-100), cv2.FONT_HERSHEY_SIMPLEX,1.2,C_SUCCESS,2,cv2.LINE_AA)
         cv2.addWeighted(ov2,alpha,img,1-alpha,0,img)
 
         cv2.imshow("CAPACITA Project - Assessment Protocol",img)
@@ -86,7 +91,7 @@ def grand_finale(sar_right, sar_left, bs_right, bs_left):
     cv2.setWindowProperty("CAPACITA Project - Assessment Complete", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     while True:
-        img = _gradient_bg()
+        img = _bg()
         cv2.rectangle(img,(0,0),(SCREEN_WIDTH,8),C_SUCCESS,-1)
         (tw, _), _ = cv2.getTextSize("Assessment Complete!", cv2.FONT_HERSHEY_DUPLEX, 2.5, 3)
         cv2.putText(img,"Assessment Complete!",((SCREEN_WIDTH-tw)//2,140),
