@@ -1,0 +1,242 @@
+# English (United States) translations for CAPACITA.
+# Copyright (C) 2026 IPBeja
+# This file is distributed under the same license as the CAPACITA project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CAPACITA 2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-22 00:00+0100\n"
+"PO-Revision-Date: 2026-04-22 00:00+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en_US\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+# ── runner_2.py ────────────────────────────────────────────────
+
+msgid "Fitness Assessment  v2.0"
+msgstr "Fitness Assessment  v2.0"
+
+msgid "Exercise sequence for this session:"
+msgstr "Exercise sequence for this session:"
+
+msgid "Right Leg  x2  ->  Left Leg  x2"
+msgstr "Right Leg  x2  ->  Left Leg  x2"
+
+msgid "Right Side x2  ->  Left Side x2"
+msgstr "Right Side x2  ->  Left Side x2"
+
+msgid "Press  SPACE  to begin  |  ESC  to exit"
+msgstr "Press  SPACE  to begin  |  ESC  to exit"
+
+msgid "Assessment complete"
+msgstr "Assessment complete"
+
+msgid "All data saved"
+msgstr "All data saved"
+
+msgid "Press  \"Q\"  to exit"
+msgstr "Press  \"Q\"  to exit"
+
+msgid "Starting"
+msgstr "Starting"
+
+msgid "Best Right Leg"
+msgstr "Best result — right leg"
+
+msgid "Best Left Leg"
+msgstr "Best result — left leg"
+
+msgid "Best Right Side"
+msgstr "Best result — right side"
+
+msgid "Best Left Side"
+msgstr "Best result — left side"
+
+# ── shared / header ────────────────────────────────────────────
+
+msgid "Sit and Reach"
+msgstr "Sit and Reach"
+
+msgid "Back Scratch"
+msgstr "Back Scratch"
+
+msgid "Side"
+msgstr "Side"
+
+msgid "Rep"
+msgstr "Rep"
+
+msgid "Right"
+msgstr "Right"
+
+msgid "Left"
+msgstr "Left"
+
+# ── calibration panel ──────────────────────────────────────────
+
+msgid "CALIBRATION STATUS"
+msgstr "CALIBRATION STATUS"
+
+msgid "Wrong Position"
+msgstr "Wrong Position"
+
+msgid "Adjust your posture"
+msgstr "Adjust your posture"
+
+msgid "Right Position"
+msgstr "Right Position"
+
+msgid "Hold still to calibrate"
+msgstr "Hold still to calibrate"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Calibrated — start the exercise"
+msgstr "Calibrated — start the exercise"
+
+msgid "Not Detected"
+msgstr "Not Detected"
+
+msgid "Position both hands in view"
+msgstr "Position both hands in view"
+
+msgid "Detected"
+msgstr "Detected"
+
+msgid "Move hands closer together"
+msgstr "Move hands closer together"
+
+msgid "Hold position to measure"
+msgstr "Hold position to measure"
+
+# ── angles overlay ─────────────────────────────────────────────
+
+msgid "Opposite Knee Angle"
+msgstr "Opposite Knee Angle"
+
+msgid "Opposite Elbow Angle"
+msgstr "Opposite Elbow Angle"
+
+msgid "Knee Angle"
+msgstr "Knee Angle"
+
+msgid "Hip Angle"
+msgstr "Hip Angle"
+
+msgid "Elbow Angle"
+msgstr "Elbow Angle"
+
+msgid "Foot position X/Y"
+msgstr "Foot position X/Y"
+
+msgid "Hand position X/Y"
+msgstr "Hand position X/Y"
+
+msgid "Dist"
+msgstr "Dist"
+
+msgid "Pose"
+msgstr "Pose"
+
+msgid "Calibration"
+msgstr "Calibration"
+
+msgid "Correct"
+msgstr "Correct"
+
+msgid "Incorrect"
+msgstr "Incorrect"
+
+msgid "Pos Right Hand"
+msgstr "Right Hand Pos."
+
+msgid "Pos Left Hand"
+msgstr "Left Hand Pos."
+
+# ── registration form ──────────────────────────────────────────
+
+msgid "Registration"
+msgstr "Registration"
+
+msgid "Age"
+msgstr "Age"
+
+msgid "Height (cm)"
+msgstr "Height (cm)"
+
+msgid "Weight (kg)"
+msgstr "Weight (kg)"
+
+msgid "Gender (M/F)"
+msgstr "Gender (M/F)"
+
+msgid "Press Enter to confirm"
+msgstr "Press Enter to confirm"
+
+msgid "Press Enter to finish"
+msgstr "Press Enter to finish"
+
+msgid "Feminine"
+msgstr "Female"
+
+msgid "Male"
+msgstr "Male"
+
+# ── real distance input ────────────────────────────────────────
+
+msgid "Real Distance"
+msgstr "Manual Measurement"
+
+msgid "Enter the measured distance (cm):"
+msgstr "Enter the measured distance (cm):"
+
+# ── repetition / final screens ─────────────────────────────────
+
+msgid "Repetition Completed"
+msgstr "Repetition Completed"
+
+msgid "Final Distance"
+msgstr "System Distance"
+
+msgid "Real Distance (result)"
+msgstr "Measured Distance"
+
+msgid "Distance between both hands"
+msgstr "Distance between both hands"
+
+msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
+msgstr "Press  \"C\"  to continue  |  \"Q\"  to quit"
+
+msgid "Exercise Completed"
+msgstr "Exercise Completed"
+
+msgid "Final Results"
+msgstr "Final Results"
+
+msgid "Final Repetition Results"
+msgstr "Repetition Results"
+
+msgid "Best result of the right leg"
+msgstr "Best result — right leg"
+
+msgid "Best result of the left leg"
+msgstr "Best result — left leg"
+
+msgid "Best result of the right side"
+msgstr "Best result — right side"
+
+msgid "Best result of the left side"
+msgstr "Best result — left side"
+
+msgid "Press  \"Q\"  to finish"
+msgstr "Press  \"Q\"  to finish"
+
+msgid "Exercise not performed correctly"
+msgstr "Exercise not performed correctly"

@@ -27,41 +27,53 @@ from babel.dates   import format_datetime
 #  INTERNACIONALIZAÇÃO  (gettext + Babel)
 # ─────────────────────────────────────────────────────────────────
 
-FONT_FILE  = "LiberationSansBold.ttf"   # fonte TrueType com suporte UTF-8
-FONT_SIZES = {}                          # cache: tamanho → ImageFont
+FONT_FILE  = "LiberationSansBold.ttf"
+FONT_SIZES = {}
 
-# Idioma padrão; pode ser substituído via argumento de linha de comando, ex:
-#   python sit_and_reach_julia.py pt_PT
 LANGUAGE = "en_US"
 args = sys.argv
 if len(args) >= 2:
     LANGUAGE = args[1]
 
-# Carrega o catálogo de mensagens do diretório ./locale
-# Estrutura esperada:  locale/<LANGUAGE>/LC_MESSAGES/messages.mo
 try:
     _lang = gettext.translation("messages", localedir="locale", languages=[LANGUAGE])
     _lang.install()
     _ = _lang.gettext
 except FileNotFoundError:
-    # Fallback: sem tradução (retorna a própria string)
     _ = gettext.gettext
 
-# Locale Babel (usa apenas a parte base, p.ex. "pt_PT" → "pt_PT")
 BABEL_LOCALE = LANGUAGE
 
 
 def fmt_number(value, decimal_places=2):
-    """Formata um número de acordo com o locale ativo (separadores locais)."""
     fmt = f"#,##0.{'0' * decimal_places}"
     return format_decimal(value, format=fmt, locale=BABEL_LOCALE)
 
 
 def fmt_datetime(value=None):
-    """Formata data/hora de acordo com o locale ativo."""
     if value is None:
         value = dt.datetime.now()
     return format_datetime(value, locale=BABEL_LOCALE)
+
+
+# ─────────────────────────────────────────────────────────────────
+#  IDENTIDADE VISUAL — CAPACITA / IPBeja
+# ─────────────────────────────────────────────────────────────────
+
+# Paleta de cores em BGR (convenção OpenCV)
+# Primária: #2D2E8F → BGR (143, 46, 45)
+# Secundária: #3C4EB8 → BGR (184, 78, 60)
+# Fundo: #EAF0F7 → BGR (247, 240, 234)
+
+C_BG        = (247, 240, 234)   # #EAF0F7  — fundo geral
+C_PRIMARY   = (143,  46,  45)   # #2D2E8F  — azul escuro CAPACITA
+C_SECONDARY = (184,  78,  60)   # #3C4EB8  — azul médio
+C_WHITE     = (255, 255, 255)
+C_DARK_TEXT = ( 45,  46, 141)   # texto escuro em fundos claros (BGR de #2D2E8F)
+C_LIGHT_TXT = (200, 200, 220)   # texto cinza suave
+C_SUCCESS   = ( 80, 180,  80)   # verde confirmação
+C_WARN      = ( 50, 140, 220)   # laranja/amarelo aviso
+C_ERROR     = ( 60,  60, 190)   # vermelho erro
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -69,7 +81,6 @@ def fmt_datetime(value=None):
 # ─────────────────────────────────────────────────────────────────
 
 def _get_font(size: int) -> ImageFont.FreeTypeFont:
-    """Retorna (e faz cache de) uma instância de ImageFont para o tamanho pedido."""
     if size not in FONT_SIZES:
         try:
             FONT_SIZES[size] = ImageFont.truetype(FONT_FILE, size)
@@ -82,60 +93,25 @@ def _get_font(size: int) -> ImageFont.FreeTypeFont:
 def put_text_utf8(img_bgr: np.ndarray, text: str, org: tuple,
                   font_size: int = 24, color: tuple = (255, 255, 255),
                   thickness: int = 1) -> np.ndarray:
-    """
-    Substituto para cv2.putText que suporta caracteres UTF-8 completos.
-
-    Parâmetros
-    ----------
-    img_bgr   : frame OpenCV (BGR, uint8)
-    text      : string UTF-8 a desenhar
-    org       : (x, y) – canto superior-esquerdo do texto
-    font_size : tamanho em pontos (≈ equivalente ao cv2 fontScale × 28)
-    color     : cor BGR  (mantém convenção OpenCV)
-    thickness : valor ignorado visualmente, mantido por compatibilidade de assinatura
-
-    Devolve o frame com o texto desenhado (opera in-place E devolve o array).
-    """
-    # Converter BGR → RGB para o PIL
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     pil_img = Image.fromarray(img_rgb)
     draw    = ImageDraw.Draw(pil_img)
     font    = _get_font(font_size)
-
-    # PIL usa cor RGB
     rgb_color = (color[2], color[1], color[0])
     draw.text(org, text, font=font, fill=rgb_color)
-
-    # Converter de volta para BGR e escrever no array original
     result = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
     np.copyto(img_bgr, result)
     return img_bgr
 
 
 def get_text_size_utf8(text: str, font_size: int) -> tuple:
-    """
-    Equivalente a cv2.getTextSize para fontes PIL.
-    Devolve (largura, altura) em píxeis.
-    """
     font = _get_font(font_size)
-    bbox = font.getbbox(text)       # (left, top, right, bottom)
+    bbox = font.getbbox(text)
     return (bbox[2] - bbox[0], bbox[3] - bbox[1])
 
 
 def batch_put_text_utf8(img_bgr: np.ndarray, text_items: list) -> np.ndarray:
-    """
-    OPTIMIZED: Batch render múltiplos textos com uma única conversão BGR↔RGB.
-    
-    Parâmetros
-    ----------
-    img_bgr : frame OpenCV (BGR, uint8)
-    text_items : lista de tuplas (text, org, font_size, color)
-                 onde org=(x,y), font_size=int, color=BGR tuple
-    
-    Retorna o frame com todo o texto desenhado (opera in-place).
-    
-    Melhoria de performance: Reduz conversões de cores de ~7 para ~1-2 por frame.
-    """
+    """Batch render múltiplos textos com uma única conversão BGR↔RGB."""
     if not text_items:
         return img_bgr
     
@@ -143,14 +119,10 @@ def batch_put_text_utf8(img_bgr: np.ndarray, text_items: list) -> np.ndarray:
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     pil_img = Image.fromarray(img_rgb)
     draw = ImageDraw.Draw(pil_img)
-    
-    # Batch all text operations in a single PIL draw session
     for text, org, font_size, color in text_items:
         font = _get_font(font_size)
         rgb_color = (color[2], color[1], color[0])  # BGR → RGB
         draw.text(org, text, font=font, fill=rgb_color)
-    
-    # Single conversion: RGB → BGR
     result = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
     np.copyto(img_bgr, result)
     return img_bgr
@@ -182,15 +154,6 @@ CALIBRATION_HELD_DURATION = 3
 POSE_HELD_DURATION        = 3
 AVERAGE_OVER              = 6
 
-C_PANEL   = (255, 255, 255)
-C_ACCENT  = (0,  210, 255)
-C_SUCCESS = (0,  220, 100)
-C_WARN    = (0,  160, 255)
-C_ERROR   = (60,  60, 200)
-C_WHITE   = (255, 255, 255)
-C_GREY    = (140, 140, 160)
-C_YELLOW  = (0,  230, 230)
-
 # ─────────────────────────────────────────────────────────────────
 #  KINECT / MEDIAPIPE
 # ─────────────────────────────────────────────────────────────────
@@ -203,57 +166,62 @@ holistic          = mp_holistic.Holistic()
 
 
 # ─────────────────────────────────────────────────────────────────
-#  OVERLAYS  (usam batch_put_text_utf8 para otimização)
+#  OVERLAYS — IDENTIDADE VISUAL CAPACITA
 # ─────────────────────────────────────────────────────────────────
 
 def draw_header(img, exercise_label, side_label, rep_num, total_reps):
-    """Barra superior: nome do exercício | lado | contador de repetições."""
+    """
+    Header com 3 colunas: exercício | lado | repetição
+    Estilo CAPACITA: fundo azul escuro, texto branco, linha separadora
+    """
     h, w = img.shape[:2]
-    cv2.rectangle(img, (0, 0), (w, 70), C_PANEL, -1)
-    cv2.line(img, (0, 70), (w, 70), C_ACCENT, 2)
+    header_h = 72
 
-    # PHASE 2 OPTIMIZATION: Batch text rendering
+    # Fundo do header: azul escuro CAPACITA
+    cv2.rectangle(img, (0, 0), (w, header_h), C_PRIMARY, -1)
+    # Linha inferior de separação em azul secundário
+    cv2.line(img, (0, header_h), (w, header_h), C_SECONDARY, 3)
+
     text_items = []
-    
-    # Exercise label
-    text_items.append((exercise_label, (20, 14), 32, C_ACCENT))
-    
-    # Side label
+
+    # Coluna esquerda — nome do exercício
+    text_items.append((exercise_label.upper(), (24, 20), 26, C_WHITE))
+
+    # Coluna central — lado
     side_text = f"{_('Side')}: {side_label}"
-    tw, fm = get_text_size_utf8(side_text, 28)
-    text_items.append((side_text, (w // 2 - tw // 2, 18), 28, C_YELLOW))
-    
-    # Rep counter
+    tw, _ = get_text_size_utf8(side_text, 26)
+    text_items.append((side_text, (w // 2 - tw // 2, 20), 26, C_WHITE))
+
+    # Coluna direita — repetição
     rep_text = f"{_('Rep')} {rep_num}/{total_reps}"
-    tw2, fm = get_text_size_utf8(rep_text, 28)
-    text_items.append((rep_text, (w - tw2 - 20, 18), 28, C_WHITE))
-    
-    # Batch render all text at once (1 color conversion instead of 3)
+    tw2, _ = get_text_size_utf8(rep_text, 26)
+    text_items.append((rep_text, (w - tw2 - 24, 20), 26, C_WHITE))
+
     batch_put_text_utf8(img, text_items)
 
 
 def draw_calibration_legend(img, calib_status):
     """
-    Painel inferior-esquerdo com os três estados de calibração.
-    O estado activo é realçado; os outros são esbatidos.
+    Painel de calibração no canto inferior esquerdo.
+    Estilo CAPACITA: fundo claro, borda azul escuro, estado ativo destacado.
     """
     h, w = img.shape[:2]
-    px, py  = 20, h - 220
-    panel_w = 430
-    panel_h = 205
+    px, py  = 16, h - 230
+    panel_w = 440
+    panel_h = 215
 
+    # Fundo semitransparente — branco com leve azul
     overlay = img.copy()
-    cv2.rectangle(overlay, (px - 10, py - 10),
-                  (px + panel_w, py + panel_h), C_PANEL, -1)
-    cv2.addWeighted(overlay, 0.78, img, 0.22, 0, img)
-    cv2.rectangle(img, (px - 10, py - 10),
-                  (px + panel_w, py + panel_h), C_ACCENT, 1)
+    cv2.rectangle(overlay, (px - 8, py - 8),
+                  (px + panel_w, py + panel_h), C_BG, -1)
+    cv2.addWeighted(overlay, 0.88, img, 0.12, 0, img)
+    # Borda azul escuro
+    cv2.rectangle(img, (px - 8, py - 8),
+                  (px + panel_w, py + panel_h), C_PRIMARY, 2)
 
-    # PHASE 2 OPTIMIZATION: Prepare all text for batch rendering
     text_items = []
-    text_items.append((_("CALIBRATION STATUS"), (px, py + 2), 18, C_GREY))
-    
-    cv2.line(img, (px, py + 28), (px + panel_w - 10, py + 28), C_GREY, 1)
+    text_items.append((_("CALIBRATION STATUS"), (px, py + 4), 16, C_LIGHT_TXT))
+    cv2.line(img, (px, py + 30), (px + panel_w - 8, py + 30), C_LIGHT_TXT, 1)
 
     states = [
         ("Wrong Position", C_ERROR,   _("Adjust your posture")),
@@ -262,27 +230,25 @@ def draw_calibration_legend(img, calib_status):
     ]
 
     for i, (label, col, hint) in enumerate(states):
-        row_y  = py + 58 + i * 52
+        row_y  = py + 60 + i * 54
         active = (calib_status == label)
 
-        sq_col = col if active else (50, 50, 70)
-        cv2.rectangle(img, (px, row_y - 18), (px + 16, row_y + 6), sq_col, -1)
+        sq_col = col if active else C_LIGHT_TXT
+        cv2.rectangle(img, (px, row_y - 18), (px + 14, row_y + 8), sq_col, -1)
         if active:
-            cv2.rectangle(img, (px, row_y - 18), (px + 16, row_y + 6), C_WHITE, 1)
+            cv2.rectangle(img, (px - 1, row_y - 19), (px + 15, row_y + 9), C_PRIMARY, 1)
 
-        txt_col  = C_WHITE if active else C_GREY
-        fs_label = 22      if active else 18
-        text_items.append((_(label), (px + 26, row_y - 18), fs_label, txt_col))
+        txt_col  = C_DARK_TEXT if active else C_LIGHT_TXT
+        fs_label = 22 if active else 17
+        text_items.append((_(label), (px + 24, row_y - 18), fs_label, txt_col))
 
-        hint_col = col if active else (65, 65, 85)
-        text_items.append((hint, (px + 26, row_y + 6), 15, hint_col))
+        hint_col = col if active else C_LIGHT_TXT
+        text_items.append((hint, (px + 24, row_y + 8), 14, hint_col))
 
         if active:
-            text_items.append(("<<", (px + panel_w - 40, row_y - 14), 20, col))
+            text_items.append(("◀", (px + panel_w - 30, row_y - 12), 18, col))
 
-    # Batch render all text at once (1 color conversion instead of 9+)
     batch_put_text_utf8(img, text_items)
-    
     return py + panel_h
 
 
@@ -290,25 +256,74 @@ def draw_calibration_legend(img, calib_status):
 #  ECRÃS BASE
 # ─────────────────────────────────────────────────────────────────
 
-def _gradient_bg(h=500, w=900):
-    img = np.ones((h, w, 3), dtype=np.uint8) * 255
+def _capacita_bg(h=840, w=1456):
+    """Fundo azul muito claro, estilo CAPACITA."""
+    img = np.ones((h, w, 3), dtype=np.uint8)
+    img[:] = (247, 240, 234)   # C_BG em BGR
     return img
 
 
-def _base_screen(title_text, lines, prompt):
-    img = _gradient_bg()
-    cv2.rectangle(img, (0, 0), (900, 6), C_ACCENT, -1)
+def _draw_capacita_frame(img, title_text, subtitle=None):
+    """
+    Frame base com borda e cabeçalho CAPACITA.
+    Retorna o img com o frame desenhado e a posição y disponível para conteúdo.
+    """
+    h, w = img.shape[:2]
 
-    tw, th = get_text_size_utf8(title_text, 40)
-    put_text_utf8(img, title_text, (900 // 2 - tw // 2, 30), font_size=40, color=(0, 0, 0))
-    cv2.line(img, (60, 100), (840, 100), C_ACCENT, 1)
+    # IPBeja / Operador no canto superior direito
+    op_text = "IPBeja / Operador"
+    tw, _ = get_text_size_utf8(op_text, 20)
+    put_text_utf8(img, op_text, (w - tw - 30, 24), font_size=20, color=C_DARK_TEXT)
+
+    # Linha horizontal do título
+    title_x = 60
+    title_y  = 30
+
+    # Título em bold azul escuro
+    tw2, th2 = get_text_size_utf8(title_text, 44)
+    put_text_utf8(img, title_text, (title_x + 20, title_y), font_size=44, color=C_PRIMARY)
+
+    # Linhas decorativas ao lado do título
+    cv2.line(img, (title_x, title_y + th2 // 2 + 4),
+             (title_x + 16, title_y + th2 // 2 + 4), C_PRIMARY, 3)
+    cv2.line(img, (title_x + 20 + tw2 + 12, title_y + th2 // 2 + 4),
+             (w - 60, title_y + th2 // 2 + 4), C_PRIMARY, 3)
+
+    content_top = title_y + th2 + 20
+
+    # Caixa de conteúdo com borda
+    box_x1, box_y1 = 60, content_top
+    box_x2, box_y2 = w - 60, h - 60
+    cv2.rectangle(img, (box_x1, box_y1), (box_x2, box_y2), C_PRIMARY, 2)
+
+    if subtitle:
+        # Linha inferior do frame com info contextual
+        sub_y = h - 50
+        cv2.line(img, (box_x1, sub_y - 10), (box_x2, sub_y - 10), C_PRIMARY, 1)
+        put_text_utf8(img, subtitle, (box_x1 + 20, sub_y), font_size=18, color=C_DARK_TEXT)
+
+    return box_x1 + 20, box_y1 + 20, box_x2 - 20, box_y2 - 20
+
+
+def _base_screen(title_text, lines, prompt, subtitle=None):
+    """Ecrã base com identidade CAPACITA."""
+    img = _capacita_bg(600, 960)
+    cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, title_text, subtitle)
 
     for i, (text, color) in enumerate(lines):
-        put_text_utf8(img, text, (60, 120 + i * 55), font_size=28, color=color)
+        # Bloco de resultado: barra azul + valor em caixa branca
+        bar_y = cy1 + 10 + i * 110
+        cv2.rectangle(img, (cx1, bar_y), (cx2 - 20, bar_y + 36), C_PRIMARY, -1)
+        tw, _ = get_text_size_utf8(text, 22)
+        put_text_utf8(img, text, (cx1 + 16, bar_y + 6), font_size=22, color=C_WHITE)
+        # Valor separado abaixo seria ideal mas aqui os dados já vêm formatados
+        cv2.rectangle(img, (cx1, bar_y + 38), (cx2 - 20, bar_y + 82), C_WHITE, -1)
+        cv2.rectangle(img, (cx1, bar_y + 38), (cx2 - 20, bar_y + 82), C_PRIMARY, 1)
 
-    cv2.line(img, (60, 420), (840, 420), C_GREY, 1)
-    pw, dw = get_text_size_utf8(prompt, 22)
-    put_text_utf8(img, prompt, (900 // 2 - pw // 2, 430), font_size=22, color=(0, 0, 0))
+    # Prompt centrado na base
+    cv2.line(img, (60, 540), (900, 540), C_LIGHT_TXT, 1)
+    pw, _ = get_text_size_utf8(prompt, 20)
+    put_text_utf8(img, prompt, (480 - pw // 2, 550), font_size=20, color=C_DARK_TEXT)
     return img
 
 
@@ -360,15 +375,11 @@ def calculate_angle(a, b, c):
 def process_frame(kinect):
     """
     PHASE 1 OPTIMIZATION: Eliminated redundant color space conversions.
-    
-    Old flow: BGRA → BGR → RGB → RGB (writeable) → BGR = 3 conversions + overhead
+    Old flow: BGRA → BGR → RGB → RGB (writeable) → BGR = 3 conversions
     New flow: BGRA → RGB (direct) = 1 conversion
-    
-    Saves ~20-30ms per frame.
     """
     frame = kinect.get_last_color_frame()
     frame = frame.reshape((1080, 1920, 4))
-    # Direct BGRA → RGB conversion (1 operation instead of 3)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
     return cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR), holistic.process(rgb_frame), frame
 
@@ -441,23 +452,23 @@ def draw_angles_arcs(repeats, knee_angle, opposite_knee_angle, hip_angle,
 
     put_text_utf8(image,
                   f"{_('Opposite Knee Angle')}: {fmt_number(opposite_knee_angle)}",
-                  (1000, 400), font_size=24, color=(0, 235, 0))
+                  (1000, 400), font_size=22, color=C_WHITE)
     put_text_utf8(image,
                   f"{_('Opposite Elbow Angle')}: {fmt_number(opposite_elbow_angle)}",
-                  o_elbow_c, font_size=24, color=(0, 235, 0))
+                  o_elbow_c, font_size=22, color=C_WHITE)
     draw_dynamic_angle_arc(image, o_shoulder_c, o_elbow_c, o_wrist_c, opposite_elbow_angle)
     draw_dynamic_angle_arc(image, hip_c, knee_c, ankle_c, knee_angle)
     put_text_utf8(image,
                   f"{_('Knee Angle')}: {fmt_number(knee_angle)}",
-                  knee_c, font_size=24, color=(0, 230, 0))
+                  knee_c, font_size=22, color=C_WHITE)
     draw_dynamic_angle_arc(image, shoulder_c, hip_c, knee_c, hip_angle)
     put_text_utf8(image,
                   f"{_('Hip Angle')}: {fmt_number(hip_angle)}",
-                  hip_c, font_size=24, color=(0, 235, 0))
+                  hip_c, font_size=22, color=C_WHITE)
     draw_dynamic_angle_arc(image, shoulder_c, elbow_c, wrist_c, elbow_angle)
     put_text_utf8(image,
                   f"{_('Elbow Angle')}: {fmt_number(elbow_angle)}",
-                  elbow_c, font_size=24, color=(0, 235, 0))
+                  elbow_c, font_size=22, color=C_WHITE)
 
 
 def calculate_angles(repeats, pose_landmarks):
@@ -524,16 +535,26 @@ def check_posture(pose_correct_start_time, knee_angle, opposite_knee_angle, hip_
 
 
 # ─────────────────────────────────────────────────────────────────
-#  ECRÃS DE RESULTADO / ENTRADA
+#  ECRÃS DE RESULTADO — IDENTIDADE VISUAL CAPACITA
 # ─────────────────────────────────────────────────────────────────
 
 def final_visualization(left, right):
-    lines = [
-        (f"{_('Best result of the right leg')}: {left} cm",  C_SUCCESS),
-        (f"{_('Best result of the left leg')} : {right} cm", C_SUCCESS),
-    ]
-    img = _base_screen(_("Exercise Completed"), lines,
-                       _('Press  "Q"  to finish'))
+    """Ecrã final com resultados. Dois blocos de resultado estilo CAPACITA."""
+    img = _capacita_bg(600, 960)
+    cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Exercise Completed"))
+
+    # Bloco 1
+    _draw_result_block(img, cx1, cy1 + 10,  cx2,
+                       _("Best result of the right leg"), f"{left} cm")
+    # Bloco 2
+    _draw_result_block(img, cx1, cy1 + 130, cx2,
+                       _("Best result of the left leg"),  f"{right} cm")
+
+    # Prompt
+    prompt = _('Press  "Q"  to finish')
+    pw, _ = get_text_size_utf8(prompt, 20)
+    put_text_utf8(img, prompt, (480 - pw // 2, 555), font_size=20, color=C_DARK_TEXT)
+
     cv2.imshow(_("Final Results"), img)
     while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -541,15 +562,35 @@ def final_visualization(left, right):
             break
 
 
+def _draw_result_block(img, x1, y1, x2, label, value):
+    """Bloco de resultado: barra de label azul + caixa de valor branca."""
+    bar_h = 38
+    val_h = 52
+    # Barra de label
+    cv2.rectangle(img, (x1, y1), (x2 - 20, y1 + bar_h), C_PRIMARY, -1)
+    put_text_utf8(img, label, (x1 + 14, y1 + 6), font_size=22, color=C_WHITE)
+    # Caixa de valor
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), C_WHITE, -1)
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), C_SECONDARY, 1)
+    put_text_utf8(img, value, (x1 + 14, y1 + bar_h + 10), font_size=28, color=C_DARK_TEXT)
+
+
 def final_repetition_visualization(final_distance, real_dist,
                                    exercise_label, side_label, rep_num):
-    lines = [
-        (f"{_('Final Distance')} : {final_distance} cm", C_SUCCESS),
-        (f"{_('Real Distance')}  : {real_dist} cm",      C_ACCENT),
-        (f"{exercise_label}  |  {_('Side')}: {side_label}  |  {_('Rep')} {rep_num}", C_GREY),
-    ]
-    img = _base_screen(_("Repetition Completed"), lines,
-                       _('Press  "C"  to continue  |  "Q"  to quit'))
+    """Ecrã de repetição concluída. Estilo CAPACITA."""
+    subtitle = f"{exercise_label}  |  {_('Side')}: {side_label}  |  {_('Rep')} {rep_num}"
+    img = _capacita_bg(600, 960)
+    cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Repetition Completed"), subtitle=subtitle)
+
+    _draw_result_block(img, cx1, cy1 + 10,  cx2,
+                       _("Final Distance"),  f"{final_distance} cm")
+    _draw_result_block(img, cx1, cy1 + 130, cx2,
+                       _("Real Distance"),   f"{real_dist} cm")
+
+    prompt = _('Press  "C"  to continue  |  "Q"  to quit')
+    pw, _ = get_text_size_utf8(prompt, 20)
+    put_text_utf8(img, prompt, (480 - pw // 2, 555), font_size=20, color=C_DARK_TEXT)
+
     cv2.imshow(_("Final Repetition Results"), img)
     while True:
         key = cv2.waitKey(1) & 0xFF
@@ -560,7 +601,7 @@ def final_repetition_visualization(final_distance, real_dist,
 
 
 def register():
-    # Os nomes dos campos são traduzíveis
+    """Formulário de registo com identidade visual CAPACITA."""
     fields = [
         _("Age"),
         _("Height (cm)"),
@@ -569,33 +610,55 @@ def register():
     ]
     values = ["", "", "", ""]
     active_field = -1
-    positions = [(50, 50 + i * 80, 550, 100 + i * 80) for i in range(len(fields))]
+
+    # Posições dos campos dentro da caixa de conteúdo
+    field_x1, field_x2 = 340, 760
+    field_ys = [220, 320, 420, 520]
+    positions = [(field_x1, fy - 30, field_x2, fy + 10) for fy in field_ys]
 
     def mouse_callback(event, x, y, flags, param):
         nonlocal active_field
         if event == cv2.EVENT_LBUTTONDOWN:
             active_field = -1
             for i, (x1, y1, x2, y2) in enumerate(positions):
-                if x1 <= x <= x2 and y1 <= y <= y2:
+                if x1 <= x <= x2 and y1 - 30 <= y <= y2 + 30:
                     active_field = i; break
 
     win_title = _("Registration")
-    cv2.namedWindow(win_title)
+    cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(win_title, 840, 700)
     cv2.setMouseCallback(win_title, mouse_callback)
 
     while True:
-        img = 255 * np.ones((400, 600, 3), dtype=np.uint8)
-        for i, (x1, y1, x2, y2) in enumerate(positions):
-            background_color = (230, 230, 230)
-            cv2.rectangle(img, (x1, y1), (x2, y2), background_color, -1)
-            border_color = (0, 255, 0) if i == active_field else (0, 0, 0)
-            cv2.rectangle(img, (x1, y1), (x2, y2), border_color, 2)
-            # Rótulo acima do campo — suporta UTF-8 (ex: "Gênero (M/F)" em pt_BR)
-            put_text_utf8(img, f"{fields[i]}:", (x1 + 10, y1 - 22), font_size=18, color=(0, 0, 0))
-            put_text_utf8(img, values[i],       (x1 + 10, y2 - 28), font_size=22, color=(0, 0, 0))
+        img = _capacita_bg(700, 840)
 
-        put_text_utf8(img, _("Press Enter to confirm"),
-                      (50, 365), font_size=16, color=(100, 100, 100))
+        # Frame CAPACITA com título CADASTRO
+        cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Registration"))
+
+        # Cabeçalho da caixa
+        cv2.rectangle(img, (cx1, cy1), (cx2, cy1 + 46), C_PRIMARY, -1)
+        tw, _ = get_text_size_utf8(_("Registration").upper(), 26)
+        put_text_utf8(img, _("Registration").upper(),
+                      ((cx1 + cx2) // 2 - tw // 2, cy1 + 8), font_size=26, color=C_WHITE)
+
+        for i, (fy) in enumerate(field_ys):
+            x1, x2 = field_x1, field_x2
+            label_y = fy - 28
+            field_y1, field_y2 = fy, fy + 50
+
+            put_text_utf8(img, f"{fields[i]}:", (x1, label_y), font_size=18, color=C_DARK_TEXT)
+
+            border_col = C_PRIMARY if i == active_field else C_SECONDARY
+            bw = 2 if i == active_field else 1
+            cv2.rectangle(img, (x1, field_y1), (x2, field_y2), C_WHITE, -1)
+            cv2.rectangle(img, (x1, field_y1), (x2, field_y2), border_col, bw)
+
+            put_text_utf8(img, values[i], (x1 + 10, field_y1 + 8), font_size=24, color=C_DARK_TEXT)
+
+        prompt = _("Press Enter to confirm")
+        pw, _ = get_text_size_utf8(prompt, 17)
+        put_text_utf8(img, prompt, (420 - pw // 2, 640), font_size=17, color=C_LIGHT_TXT)
+
         cv2.imshow(win_title, img)
         key = cv2.waitKey(10) & 0xFF
         if key == 27:
@@ -614,17 +677,30 @@ def register():
 def real_distance():
     distancia = ""
     win_title = _("Real Distance")
-    cv2.namedWindow(win_title)
+    cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(win_title, 700, 420)
+
     while True:
-        img = np.ones((200, 600, 3), dtype=np.uint8) * 255
-        cv2.rectangle(img, (50, 60),  (550, 120), (230, 230, 230), -1)
-        cv2.rectangle(img, (50, 60),  (550, 120), (0, 0, 0), 2)
-        put_text_utf8(img, _("Enter the measured distance (cm):"),
-                      (50, 22), font_size=22, color=(0, 0, 0))
-        put_text_utf8(img, distancia,
-                      (60, 72), font_size=32, color=(0, 0, 255))
-        put_text_utf8(img, _("Press Enter to confirm"),
-                      (50, 155), font_size=16, color=(100, 100, 100))
+        img = _capacita_bg(420, 700)
+        cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Real Distance"))
+
+        # Cabeçalho da caixa
+        cv2.rectangle(img, (cx1, cy1), (cx2, cy1 + 42), C_PRIMARY, -1)
+        label = _("Enter the measured distance (cm):")
+        tw, _ = get_text_size_utf8(label, 20)
+        put_text_utf8(img, label, (cx1 + 14, cy1 + 8), font_size=20, color=C_WHITE)
+
+        # Campo de entrada
+        fi_y1, fi_y2 = cy1 + 65, cy1 + 130
+        cv2.rectangle(img, (cx1, fi_y1), (cx2, fi_y2), C_WHITE, -1)
+        cv2.rectangle(img, (cx1, fi_y1), (cx2, fi_y2), C_PRIMARY, 2)
+        put_text_utf8(img, distancia, (cx1 + 16, fi_y1 + 12), font_size=38, color=C_DARK_TEXT)
+
+        # Prompt
+        prompt = _("Press Enter to confirm")
+        pw, _ = get_text_size_utf8(prompt, 17)
+        put_text_utf8(img, prompt, (350 - pw // 2, 360), font_size=17, color=C_LIGHT_TXT)
+
         cv2.imshow(win_title, img)
         key = cv2.waitKey(10) & 0xFF
         if key == 27:
@@ -706,21 +782,21 @@ def process_exercise(repeats):
 
                     # PHASE 2 OPTIMIZATION: Batch text rendering for all information display
                     info_texts = [
-                        (f"{_('Foot position X/Y')}: {foot[0]}, {foot[1]}", (1000, 100), 24, (0, 235, 0)),
-                        (f"{_('Hand position X/Y')}: {hand[0]}, {hand[1]}", (1000, 200), 24, (0, 235, 0)),
-                        (f"{_('Dist')}: {fmt_number(distance)} cm", (50, 30), 26, (0, 0, 0)),
-                        (f"{_('Pose')}: {_(pose_correct)}", (50, 230), 26, (128, 0, 0)),
-                        (f"{_('Calibration')}: {_(calibration)}", (50, 130), 26, (128, 0, 0)),
+                        (f"{_('Foot position X/Y')}: {foot[0]}, {foot[1]}", (1000, 100), 22, C_WHITE),
+                        (f"{_('Hand position X/Y')}: {hand[0]}, {hand[1]}", (1000, 200), 22, C_WHITE),
+                        (f"{_('Dist')}: {fmt_number(distance)} cm", (50, 100), 24, C_WHITE),
+                        (f"{_('Pose')}: {_(pose_correct)}", (50, 230), 24, C_WHITE),
+                        (f"{_('Calibration')}: {_(calibration)}", (50, 130), 24, C_WHITE),
                     ]
                     batch_put_text_utf8(image, info_texts)
                 else:
                     # PHASE 2 OPTIMIZATION: Batch text rendering during calibration phase
                     calib_texts = [
-                        (f"{_('Calibration')}: {_(calibration)}", (50, 130), 26, (128, 0, 0)),
+                        (f"{_('Calibration')}: {_(calibration)}", (50, 130), 24, C_WHITE),
                     ]
                     batch_put_text_utf8(image, calib_texts)
 
-            # Overlays v2
+            # Overlays CAPACITA
             draw_header(image, _("Sit and Reach"), side_label, rep_num, 2)
             draw_calibration_legend(image, calibration)
 
@@ -769,7 +845,6 @@ while repeats < 4:
             distances_left.append(final_distance)
             side = "left"
 
-        # Usa fmt_datetime() para o timestamp localizado
         with open("./logs_utentes/logs_sit_and_reach_utentes", "a",
                   encoding="utf-8") as arquivo:
             arquivo.write(f"{fmt_datetime()}, {age}, {height}, {weight}, "
