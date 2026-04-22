@@ -146,7 +146,7 @@ msgstr "Press Enter to confirm"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:562
 msgid "Real Distance"
-msgstr "Real Distance"
+msgstr "Automatically measured distance"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:568
 msgid "Enter the measured distance (cm):"
@@ -203,9 +203,6 @@ msgstr "Best result of the left leg"
 msgid "Final Distance"
 msgstr "Final Distance"
 
-msgid "Real Distance"
-msgstr "Real Distance"
-
 msgid "Incorrect"
 msgstr "Incorrect"
 
@@ -258,13 +255,26 @@ msgid "Press Enter to finish"
 msgstr "Press Enter to finish"
 
 msgid "Pos Right Hand"
-msgstr "Pos Right Hand"
+msgstr "Right Hand Pos."
 
 msgid "Pos Left Hand"
-msgstr "Pos Left Hand"
+msgstr "Left Hand Pos."
 
 msgid "Correct"
 msgstr "Correct"
 
 msgid "Incorrect"
 msgstr "Incorrect"
+
+
+msgid "Best Right Leg"
+msgstr "Best result on the right leg"
+
+msgid "Best Left Leg"
+msgstr "Best result on the left leg"
+
+msgid "Best Right Side"
+msgstr "Best result on the right side"
+
+msgid "Best Left Side"
+msgstr "Best result on the left side"

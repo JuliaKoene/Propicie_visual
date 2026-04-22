@@ -196,12 +196,12 @@ def grand_finale(sar_right, sar_left, bs_right, bs_left):
 
         sections = [
             (_("Sit and Reach"), [
-                (f"Best Right Leg : {sar_right} cm", C_ACCENT),
-                (f"Best Left Leg  : {sar_left}  cm", C_ACCENT),
+                (f"{_("Best Right Leg")} : {sar_right} cm", C_ACCENT),
+                (f"{_("Best Left Leg")}  : {sar_left}  cm", C_ACCENT),
             ]),
             (_("Back Scratch"), [
-                (f"Best Right Side: {bs_right} cm", C_YELLOW),
-                (f"Best Left Side : {bs_left}  cm", C_YELLOW),
+                (f"{_("Best Right Side")}: {bs_right} cm", C_YELLOW),
+                (f"{_("Best Left Side")} : {bs_left}  cm", C_YELLOW),
             ]),
         ]
         

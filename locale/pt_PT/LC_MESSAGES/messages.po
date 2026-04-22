@@ -30,7 +30,7 @@ msgstr "Perna direita x2 -> Perna esquerda x2"
 
 #: runner_2.py:118 runner_2.py:202 runner_2.py:289 runner_2.py:292
 msgid "Back Scratch"
-msgstr "Coçar as costas"
+msgstr "Alcançar atrás das costas"
 
 #: runner_2.py:118
 msgid "Right Side x2  ->  Left Side x2"
@@ -46,7 +46,7 @@ msgstr "Sequência de exercícios para esta sessão:"
 
 #: runner_2.py:159
 msgid "Press  SPACE  to begin  |  ESC  to exit"
-msgstr "Prima a barra de espaço para iniciar | Prima Esc para saíres"
+msgstr "Prima a barra de espaço para iniciar | Prima Esc para sair"
 
 #: runner_2.py:192 runner_2.py:298
 msgid "Assessment complete"
@@ -54,7 +54,7 @@ msgstr "Bateria completa"
 
 #: runner_2.py:224
 msgid "Press  \"Q\"  to exit"
-msgstr "Prima Q para saíres"
+msgstr "Prima Q para sair"
 
 #: runner_2.py:282 runner_2.py:289
 msgid "Starting"
@@ -63,12 +63,12 @@ msgstr "A iniciar"
 #: Sit-and-Reach/sit_and_reach_julia.py:593
 #: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
 msgid "Right"
-msgstr "Direita"
+msgstr "Direito"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:593
 #: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
 msgid "Left"
-msgstr "Esquerda"
+msgstr "Esquerdo"
 
 #: runner_2.py:298
 msgid "All data saved"
@@ -84,7 +84,7 @@ msgstr "Ajusta a tua postura"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:214
 msgid "Hold still to calibrate"
-msgstr "Calibrando. Não te movas..."
+msgstr "Calibrando. Não se mova..."
 
 #: Sit-and-Reach/sit_and_reach_julia.py:215
 msgid "Calibrated — start the exercise"
@@ -96,7 +96,7 @@ msgstr "Exercício completo"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:482
 msgid "Press  \"Q\"  to finish"
-msgstr "Prima Q para finalizares"
+msgstr "Prima Q para finalizar"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:483
 msgid "Final Results"
@@ -108,7 +108,7 @@ msgstr "Repetição completa"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:498
 msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
-msgstr "Prima C para prosseguir | Prima Q para saíres"
+msgstr "Prima C para prosseguir | Prima Q para sair"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:499
 #: Sit-and-Reach/sit_and_reach_julia.py:503
@@ -129,7 +129,7 @@ msgstr "Peso (kg)"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:514
 msgid "Gender (M/F)"
-msgstr "Gênero (M/F)"
+msgstr "Género (M/F)"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:528
 msgid "Registration"
@@ -142,11 +142,11 @@ msgstr "Prima Enter para submeter"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:562
 msgid "Real Distance"
-msgstr "Distância pela medição automática"
+msgstr "Distância da medição manual"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:568
 msgid "Enter the measured distance (cm):"
-msgstr "Informa a distância pela medição manual (cm)"
+msgstr "Registe a distância da medição manual (cm)"
 
 #: Sit-and-Reach/sit_and_reach_julia.py:691
 msgid "Feminine"
@@ -197,10 +197,7 @@ msgid "Best result of the left leg"
 msgstr "Melhor resultado da perna esquerda"
 
 msgid "Final Distance"
-msgstr "Distância final"
-
-msgid "Real Distance"
-msgstr "Distância real"
+msgstr "Distância da medição automática"
 
 msgid "Incorrect"
 msgstr "Incorreta"
@@ -239,7 +236,7 @@ msgid "Hold position to measure"
 msgstr "Mantém a posição para medir"
 
 msgid "Distance between both hands"
-msgstr "Distância entre as mãos"
+msgstr "Distância da medição automática"
 
 msgid "Best result of the right side"
 msgstr "Melhor resultado do lado direito"
@@ -248,19 +245,31 @@ msgid "Best result of the left side"
 msgstr "Melhor resultado do lado esquerdo"
 
 msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
-msgstr "Prima C para prosseguir | Prima Q para saíres"
+msgstr "Prima C para prosseguir | Prima Q para sair"
 
 msgid "Press Enter to finish"
 msgstr "Prima Enter para terminar"
 
 msgid "Pos Right Hand"
-msgstr "Pos mão direita"
+msgstr "Pos. mão direita"
 
 msgid "Pos Left Hand"
-msgstr "Pos mão esquerda"
+msgstr "Pos. mão esquerda"
 
 msgid "Correct"
 msgstr "Correta"
 
 msgid "Incorrect"
 msgstr "Incorreta"
+
+msgid "Best Right Leg"
+msgstr "Melhor resultado com a perna direita"
+
+msgid "Best Left Leg"
+msgstr "Melhor resultado com a perna esquerda"
+
+msgid "Best Right Side"
+msgstr "Melhor resultado do lado direito"
+
+msgid "Best Left Side"
+msgstr "Melhor resultado do lado esquerdo"
