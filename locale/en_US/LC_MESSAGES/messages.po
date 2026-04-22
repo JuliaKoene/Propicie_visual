@@ -1,0 +1,280 @@
+# English (United States) translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-04-20 16:52+0100\n"
+"PO-Revision-Date: 2026-04-20 14:35+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en_US\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:668
+#: Sit-and-Reach/sit_and_reach_julia.py:726 runner_2.py:117 runner_2.py:198
+#: runner_2.py:282 runner_2.py:285
+msgid "Sit and Reach"
+msgstr "Sit and Reach"
+
+#: runner_2.py:117
+msgid "Right Leg  x2  ->  Left Leg  x2"
+msgstr "Right Leg  x2  ->  Left Leg  x2"
+
+#: runner_2.py:118 runner_2.py:202 runner_2.py:289 runner_2.py:292
+msgid "Back Scratch"
+msgstr "Back Scratch"
+
+#: runner_2.py:118
+msgid "Right Side x2  ->  Left Side x2"
+msgstr "Right Side x2  ->  Left Side x2"
+
+#: runner_2.py:129
+msgid "Fitness Assessment  v2.0"
+msgstr "Fitness Assessment  v2.0"
+
+#: runner_2.py:135
+msgid "Exercise sequence for this session:"
+msgstr "Exercise sequence for this session:"
+
+#: runner_2.py:159
+msgid "Press  SPACE  to begin  |  ESC  to exit"
+msgstr "Press  SPACE  to begin  |  ESC  to exit"
+
+#: runner_2.py:192 runner_2.py:298
+msgid "Assessment complete"
+msgstr "Assessment complete"
+
+#: runner_2.py:224
+msgid "Press  \"Q\"  to exit"
+msgstr "Press  \"Q\"  to exit"
+
+#: runner_2.py:282 runner_2.py:289
+msgid "Starting"
+msgstr "Starting"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:593
+#: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
+msgid "Right"
+msgstr "Right"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:593
+#: Sit-and-Reach/sit_and_reach_julia.py:694 runner_2.py:285 runner_2.py:292
+msgid "Left"
+msgstr "Left"
+
+#: runner_2.py:298
+msgid "All data saved"
+msgstr "All data saved"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:206
+msgid "CALIBRATION STATUS"
+msgstr "CALIBRATION STATUS"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:213
+msgid "Adjust your posture"
+msgstr "Adjust your posture"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:214
+msgid "Hold still to calibrate"
+msgstr "Hold still to calibrate"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:215
+msgid "Calibrated — start the exercise"
+msgstr "Calibrated — start the exercise"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:481
+msgid "Exercise Completed"
+msgstr "Exercise Completed"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:482
+#, fuzzy
+msgid "Press  \"Q\"  to finish"
+msgstr "Press  \"Q\"  to exit"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:483
+msgid "Final Results"
+msgstr "Final Results"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:497
+#, fuzzy
+msgid "Repetition Completed"
+msgstr "Repetition complete"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:498
+#, fuzzy
+msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
+msgstr "Press  \"C\"  to continue  |  \"Q\"  to quit"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:499
+#: Sit-and-Reach/sit_and_reach_julia.py:503
+msgid "Final Repetition Results"
+msgstr "Final Repetition Results"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:511
+msgid "Age"
+msgstr "Age"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:512
+msgid "Height (cm)"
+msgstr "Height (cm)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:513
+msgid "Weight (kg)"
+msgstr "Weight (kg)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:514
+msgid "Gender (M/F)"
+msgstr "Gender (M/F)"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:528
+#, fuzzy
+msgid "Registration"
+msgstr "Registration"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:543
+#: Sit-and-Reach/sit_and_reach_julia.py:572
+msgid "Press Enter to confirm"
+msgstr "Press Enter to confirm"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:562
+msgid "Real Distance"
+msgstr "Automatically measured distance"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:568
+msgid "Enter the measured distance (cm):"
+msgstr "Enter the measured distance (cm):"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:691
+msgid "Feminine"
+msgstr "Female"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:691
+msgid "Male"
+msgstr "Male"
+
+#: Sit-and-Reach/sit_and_reach_julia.py:729
+msgid "Exercise not performed correctly"
+msgstr "Exercise not performed correctly"
+
+msgid "Wrong Position"
+msgstr "Wrong Position"
+
+msgid "Right Position"
+msgstr "Right Position"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Side"
+msgstr "Side"
+
+msgid "Rep"
+msgstr "Rep"
+
+msgid "Opposite Knee Angle"
+msgstr "Opposite Knee Angle"
+
+msgid "Opposite Elbow Angle"
+msgstr "Opposite Elbow Angle"
+
+msgid "Knee Angle"
+msgstr "Knee Angle"
+
+msgid "Hip Angle"
+msgstr "Hip Angle"
+
+msgid "Elbow Angle"
+msgstr "Elbow Angle"
+
+msgid "Best result of the right leg"
+msgstr "Best result of the right leg"
+
+msgid "Best result of the left leg"
+msgstr "Best result of the left leg"
+
+msgid "Final Distance"
+msgstr "Final Distance"
+
+msgid "Incorrect"
+msgstr "Incorrect"
+
+msgid "Foot position X/Y"
+msgstr "Foot position X/Y"
+
+msgid "Hand position X/Y"
+msgstr "Hand position X/Y"
+
+msgid "Dist"
+msgstr "Dist"
+
+msgid "Pose"
+msgstr "Pose"
+
+msgid "Calibration"
+msgstr "Calibration"
+
+msgid "Not Detected"
+msgstr "Not Detected"
+
+msgid "Detected"
+msgstr "Detected"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Position both hands in view"
+msgstr "Position both hands in view"
+
+msgid "Move hands closer together"
+msgstr "Move hands closer together"
+
+msgid "Hold position to measure"
+msgstr "Hold position to measure"
+
+msgid "Distance between both hands"
+msgstr "Distance between both hands"
+
+msgid "Best result of the right side"
+msgstr "Best result of the right side"
+
+msgid "Best result of the left side"
+msgstr "Best result of the left side"
+
+msgid "Press  \"C\"  to continue  |  \"Q\"  to quit"
+msgstr "Press  \"C\"  to continue  |  \"Q\"  to quit"
+
+msgid "Press Enter to finish"
+msgstr "Press Enter to finish"
+
+msgid "Pos Right Hand"
+msgstr "Right Hand Pos."
+
+msgid "Pos Left Hand"
+msgstr "Left Hand Pos."
+
+msgid "Correct"
+msgstr "Correct"
+
+msgid "Incorrect"
+msgstr "Incorrect"
+
+
+msgid "Best Right Leg"
+msgstr "Best result on the right leg"
+
+msgid "Best Left Leg"
+msgstr "Best result on the left leg"
+
+msgid "Best Right Side"
+msgstr "Best result on the right side"
+
+msgid "Best Left Side"
+msgstr "Best result on the left side"
