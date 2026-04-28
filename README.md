@@ -89,7 +89,7 @@ Para executar este projeto, siga os passos abaixo.
     * Se encontrar problemas, pode ser necessário instalar o `comtypes`.
 
 5. **Para Alterrações no .po com as Linguagens**:
-    *Rode o seguinte comando sempre que os arquivos .po forem alterados.
+    * Rode o seguinte comando sempre que os arquivos .po forem alterados.
         ```bash
         python -m babel.messages.frontend compile -i locale\en_US\LC_MESSAGES\messages.po -o locale\en_US\LC_MESSAGES\messages.mo
         python -m babel.messages.frontend compile -i locale\pt_PT\LC_MESSAGES\messages.po -o locale\pt_PT\LC_MESSAGES\messages.mo
