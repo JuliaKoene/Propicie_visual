@@ -3,10 +3,10 @@ import sys
 import re
 import numpy as np
 import cv2
-import time
 import os
 import gettext
 from PIL import Image, ImageDraw, ImageFont
+import pandas as pd
 
 fontFile = "LiberationSansBold.ttf"
 
@@ -16,18 +16,44 @@ if len(args) >= 2:
     language = args[1]
 lang = gettext.translation("messages", localedir="locale", languages=[language])
 lang.install()
+_ = lang.gettext
 
 # ─────────────────────────────────────────────
-#  IDENTIDADE VISUAL CAPACITA — paleta BGR
+#  PALETA CAPACITA — BGR
 # ─────────────────────────────────────────────
-C_BG        = (247, 240, 234)   # #EAF0F7
-C_PRIMARY   = (143,  46,  45)   # #2D2E8F  azul escuro
-C_SECONDARY = (184,  78,  60)   # #3C4EB8  azul médio
+C_BG        = (247, 240, 234)
+C_PRIMARY   = (143,  46,  45)
+C_SECONDARY = (184,  78,  60)
+C_BTN_HOVER = (110,  35,  34)
 C_WHITE     = (255, 255, 255)
 C_DARK_TEXT = ( 45,  46, 141)
-C_LIGHT_TXT = (200, 200, 220)
+C_LIGHT_TXT = (180, 180, 210)
 C_SUCCESS   = ( 80, 180,  80)
-C_ACCENT    = (184,  78,  60)   # alias de C_SECONDARY para compatibilidade
+
+# ─────────────────────────────────────────────
+#  RESOLUÇÃO DINÂMICA
+# ─────────────────────────────────────────────
+_SW = 1920
+_SH = 1080
+
+def _detect_screen():
+    global _SW, _SH
+    tmp = "##detect##"
+    cv2.namedWindow(tmp, cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty(tmp, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    probe = np.zeros((4, 4, 3), dtype=np.uint8)
+    cv2.imshow(tmp, probe)
+    cv2.waitKey(1)
+    rect = cv2.getWindowImageRect(tmp)
+    if rect[2] > 100 and rect[3] > 100:
+        _SW, _SH = rect[2], rect[3]
+    cv2.destroyWindow(tmp)
+
+def W():   return _SW
+def H():   return _SH
+def S(v):  return max(1, int(v * _SW / 1920))
+def SH(v): return max(1, int(v * _SH / 1080))
+def SF(v): return max(8, int(v * min(_SW, _SH) / 1080))
 
 # ─────────────────────────────────────────────
 #  FONT CACHE (carrega uma vez por tamanho)
@@ -56,119 +82,332 @@ def put_text_utf8(img, text, pos, font_size, color_bgr, thickness=1):
     # Calcula posição ajustada (PIL usa canto superior esquerdo)
     # Obtém métricas da fonte para ajustar baseline
     bbox = draw.textbbox((0, 0), text, font=font)
-    text_height = bbox[3] - bbox[1]
-    adjusted_y = pos[1] - text_height
-    
-    # Desenha o texto
-    draw.text((pos[0], adjusted_y), text, font=font, fill=color_rgb)
-    
-    # Converte de volta para OpenCV
+    th = bbox[3] - bbox[1]
+    draw.text((pos[0], pos[1] - th), text, font=font, fill=color_rgb)
     return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
-
-def get_text_size_utf8(text, font_size):
+def get_text_size(text, font_size):
     font = get_font(font_size)
     # Usa imagem dummy para calcular
     dummy_img = Image.new('RGB', (1, 1))
     draw = ImageDraw.Draw(dummy_img)
     bbox = draw.textbbox((0, 0), text, font=font)
-    return (bbox[2] - bbox[0], bbox[3] - bbox[1])
+    return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
+def put_text_centered(img, text, cx, cy, font_size, color_bgr):
+    tw, th = get_text_size(text, font_size)
+    return put_text_utf8(img, text, (cx - tw // 2, cy + th // 2), font_size, color_bgr)
 
-def _capacita_bg(h=600, w=900):
-    img = np.ones((h, w, 3), dtype=np.uint8)
+# ─────────────────────────────────────────────
+#  PRIMITIVAS DE LAYOUT
+# ─────────────────────────────────────────────
+def _canvas():
+    img = np.ones((H(), W(), 3), dtype=np.uint8)
     img[:] = C_BG
     return img
 
+def _draw_page_title(img, title):
+    """Título com traço curto + linha longa — fiel ao PDF."""
+    pad_x = S(60)
+    pad_y = SH(42)
+    fsz   = SF(52)
+    tw, th = get_text_size(title, fsz)
+    line_y = pad_y + th // 2
 
-def _draw_capacita_header(img, title_text, w=900):
-    """Cabeçalho de página com título e linhas decorativas estilo CAPACITA."""
-    title_x = 60
-    title_y  = 30
-    tw, th = get_text_size_utf8(title_text, 42)
-    img = put_text_utf8(img, title_text, (title_x + 20, title_y + th), font_size=42, color_bgr=C_PRIMARY)
-    cv2.line(img, (title_x, title_y + th // 2 + 4),
-             (title_x + 16, title_y + th // 2 + 4), C_PRIMARY, 3)
-    cv2.line(img, (title_x + 20 + tw + 12, title_y + th // 2 + 4),
-             (w - 60, title_y + th // 2 + 4), C_PRIMARY, 3)
-    return img, title_y + th + 20
+    cv2.line(img, (pad_x, line_y), (pad_x + S(18), line_y), C_PRIMARY, S(4))
+    img = put_text_utf8(img, title, (pad_x + S(28), pad_y + th), fsz, C_PRIMARY)
+    cv2.line(img,
+             (pad_x + S(28) + tw + S(16), line_y),
+             (W() - pad_x, line_y),
+             C_PRIMARY, S(4))
 
+    op_fsz = SF(22)
+    op_tw, op_th = get_text_size("IPBeja / Operador", op_fsz)
+    img = put_text_utf8(img, "IPBeja / Operador",
+                        (W() - op_tw - S(30), SH(52)), op_fsz, C_DARK_TEXT)
 
-def _draw_capacita_box(img, x1, y1, x2, y2):
-    cv2.rectangle(img, (x1, y1), (x2, y2), C_PRIMARY, 2)
-    return img
+    return pad_y + th + SH(22)
 
+def _border_box(img, x1, y1, x2, y2):
+    cv2.rectangle(img, (x1, y1), (x2, y2), C_PRIMARY, S(2))
+
+def _fullscreen(name):
+    cv2.namedWindow(name, cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty(name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
+# ─────────────────────────────────────────────
+#  BOLINHAS DE PROGRESSO
+# ─────────────────────────────────────────────
+def _draw_rep_circles(img, states, cx_mid, cy, radius):
+    """
+    Desenha círculos de estado lado a lado centrados em cx_mid.
+      "done"    → cheio + X branco
+      "current" → cheio + anel branco interior
+      "pending" → cheio
+    """
+    n     = len(states)
+    gap   = S(28)
+    diam  = radius * 2
+    total = n * diam + (n - 1) * gap
+    ox    = cx_mid - total // 2 + radius
+
+    for i, state in enumerate(states):
+        ccx = ox + i * (diam + gap)
+
+        # Fundo do círculo
+        cv2.circle(img, (ccx, cy), radius, C_PRIMARY, -1)
+
+        if state == "done":
+            arm = int(radius * 0.42)
+            cv2.line(img, (ccx - arm, cy - arm), (ccx + arm, cy + arm), C_WHITE, S(4))
+            cv2.line(img, (ccx + arm, cy - arm), (ccx - arm, cy + arm), C_WHITE, S(4))
+
+        elif state == "current":
+            # Anel branco — círculo cheio branco + menor círculo primário ao centro
+            inner = int(radius * 0.56)
+            cv2.circle(img, (ccx, cy), inner, C_WHITE, -1)
+            cv2.circle(img, (ccx, cy), int(inner * 0.3), C_PRIMARY, -1)
 
 # ══════════════════════════════════════════════
 #  INTRO SCREEN
 # ══════════════════════════════════════════════
+def _exercise_overview_screen(exercise_name, groups, current_rep, page_title=None):
+    WIN = "Exercise Overview"
+    _fullscreen(WIN)
 
-def intro_screen():
-    steps = [
-        ("1", _("Sit and Reach"), _("Right Leg  x2  ->  Left Leg  x2"), C_SECONDARY),
-        ("2", _("Back Scratch"),  _("Right Side x2  ->  Left Side x2"), C_PRIMARY),
-    ]
-    cv2.namedWindow("Assessment Protocol", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Assessment Protocol", 900, 600)
-    cv2.moveWindow("Assessment Protocol", 500, 200)
+    if page_title is None:
+        page_title = exercise_name
 
-    for frame_idx in range(9999):
-        img = _capacita_bg()
+    # Calcula estado de cada bolinha por grupo
+    rep_idx = 0
+    group_states = []
+    for label, n in groups:
+        states = []
+        for _r in range(n):
+            if rep_idx < current_rep:
+                states.append("done")
+            elif rep_idx == current_rep:
+                states.append("current")
+            else:
+                states.append("pending")
+            rep_idx += 1
+        group_states.append((label, states))
 
-        # IPBeja / Operador
-        op_text = "IPBeja / Operador"
-        tw, _ = get_text_size_utf8(op_text, 20)
-        img = put_text_utf8(img, op_text, (900 - tw - 30, 44), font_size=20, color_bgr=C_DARK_TEXT)
+    # Info para o footer: grupo e rep atual
+    rep_idx2 = 0
+    cur_group_label = groups[0][0]
+    cur_rep_in_grp  = 1
+    cur_grp_total   = groups[0][1]
+    for label, n in groups:
+        for r in range(n):
+            if rep_idx2 == current_rep:
+                cur_group_label = label
+                cur_rep_in_grp  = r + 1
+                cur_grp_total   = n
+            rep_idx2 += 1
 
-        # Título principal CAPACITA
-        title = _("Fitness Assessment  v2.0")
-        tw2, th2 = get_text_size_utf8(title, 42)
-        img = put_text_utf8(img, title, (60 + 20, 30 + th2), font_size=42, color_bgr=C_PRIMARY)
-        cv2.line(img, (60, 30 + th2 // 2 + 4), (76, 30 + th2 // 2 + 4), C_PRIMARY, 3)
-        cv2.line(img, (80 + tw2 + 12, 30 + th2 // 2 + 4), (840, 30 + th2 // 2 + 4), C_PRIMARY, 3)
+    for frame_idx in range(99999):
+        img = _canvas()
+        content_y = _draw_page_title(img, page_title)
 
-        content_top = 30 + th2 + 20
+        bx1 = S(60);  bx2 = W() - S(60)
+        by1 = content_y; by2 = H() - SH(80)
+        _border_box(img, bx1, by1, bx2, by2)
 
-        # Caixa de conteúdo
-        cv2.rectangle(img, (60, content_top), (840, 540), C_PRIMARY, 2)
+        # Layout das bolinhas
+        n_groups = len(group_states)
+        r_radius = S(56)
+        bar_h    = SH(62)
+        grp_h    = bar_h + SH(20) + r_radius * 2
+        gap_grp  = SH(44)
+        total_h  = n_groups * grp_h + (n_groups - 1) * gap_grp
+        start_y  = by1 + (by2 - by1 - total_h - SH(50)) // 2
+        cx_mid   = (bx1 + bx2) // 2
+        bar_w    = S(490)
 
-        # Subtítulo dentro da caixa
-        sub = _("Exercise sequence for this session:")
-        img = put_text_utf8(img, sub, (80, content_top + 38), font_size=20, color_bgr=C_LIGHT_TXT)
+        for gi, (label, states) in enumerate(group_states):
+            gy = start_y + gi * (grp_h + gap_grp)
 
-        for i, (num, name, detail, col) in enumerate(steps):
-            cy = content_top + 70 + i * 130
+            # Barra label
+            bar_x1 = cx_mid - bar_w // 2
+            bar_x2 = cx_mid + bar_w // 2
+            cv2.rectangle(img, (bar_x1, gy), (bar_x2, gy + bar_h), C_PRIMARY, -1)
+            img = put_text_centered(img, label, cx_mid, gy + bar_h // 2, SF(28), C_WHITE)
 
-            # Faixa lateral de cor
-            cv2.rectangle(img, (60, cy), (68, cy + 100), col, -1)
+            # Bolinhas abaixo
+            circles_cy = gy + bar_h + SH(20) + r_radius
+            _draw_rep_circles(img, states, cx_mid, circles_cy, r_radius)
 
-            # Círculo com número
-            cx_circle = 115
-            cv2.circle(img, (cx_circle, cy + 50), 30, col, -1)
-            img = put_text_utf8(img, num, (cx_circle - 8, cy + 64), font_size=28, color_bgr=C_WHITE)
+        # ── Footer 3 colunas ──
+        foot_y = by2 - SH(8)
+        cv2.line(img, (bx1, foot_y - SH(36)), (bx2, foot_y - SH(36)), C_PRIMARY, S(1))
+        fsz_f = SF(20)
 
-            # Nome do exercício (maior)
-            img = put_text_utf8(img, name, (165, cy + 42), font_size=30, color_bgr=C_PRIMARY)
+        img = put_text_utf8(img, exercise_name.upper(),
+                            (bx1 + S(16), foot_y), fsz_f, C_DARK_TEXT)
 
-            # Detalhe
-            img = put_text_utf8(img, detail, (165, cy + 86), font_size=18, color_bgr=col)
+        tw_c, _h = get_text_size(cur_group_label, fsz_f)
+        img = put_text_utf8(img, cur_group_label,
+                            (cx_mid - tw_c // 2, foot_y), fsz_f, C_DARK_TEXT)
+
+        rep_str = f"{_('Rep')} {cur_rep_in_grp}/{cur_grp_total}"
+        tw_r, _h = get_text_size(rep_str, fsz_f)
+        img = put_text_utf8(img, rep_str,
+                            (bx2 - tw_r - S(16), foot_y), fsz_f, C_DARK_TEXT)
 
         # Prompt piscante
-        alpha = 0.4 + 0.6 * abs(np.sin(frame_idx * 0.09))
+        alpha  = 0.35 + 0.65 * abs(np.sin(frame_idx * 0.08))
         prompt = _('Press  SPACE  to begin  |  ESC  to exit')
-        ov2 = img.copy()
-        pw, _ = get_text_size_utf8(prompt, 22)
-        ov2 = put_text_utf8(ov2, prompt, (450 - pw // 2, 573), font_size=22, color_bgr=C_SUCCESS)
-        cv2.addWeighted(ov2, alpha, img, 1 - alpha, 0, img)
+        ov = img.copy()
+        ov = put_text_centered(ov, prompt, W() // 2, H() - SH(32), SF(22), C_SUCCESS)
+        cv2.addWeighted(ov, alpha, img, 1 - alpha, 0, img)
 
-        cv2.imshow("Assessment Protocol", img)
+        cv2.imshow(WIN, img)
         key = cv2.waitKey(30) & 0xFF
         if key == 32:
-            cv2.destroyWindow("Assessment Protocol")
+            cv2.destroyWindow(WIN)
             return
         elif key == 27:
             cv2.destroyAllWindows()
             sys.exit(0)
+
+
+def _get_groups_for(mode):
+    """Devolve (sar_groups, bs_groups) para o modo escolhido."""
+    sar_groups = [
+        (f"{_('Right Side')} x2", 2),
+        (f"{_('Left Side')} x2",  2),
+    ]
+    bs_groups = [
+        (f"{_('Right Side')} x2", 2),
+        (f"{_('Left Side')} x2",  2),
+    ]
+    if mode == "sar":
+        return sar_groups, []
+    elif mode == "bs":
+        return [], bs_groups
+    return sar_groups, bs_groups   # auto
+
+
+def intro_screen(mode="auto"):
+    """Tela inicial com bolinhas antes do primeiro exercício."""
+    sar_groups, bs_groups = _get_groups_for(mode)
+
+    if mode in ("auto", "sar"):
+        _exercise_overview_screen(
+            _("Sit and Reach"),
+            sar_groups,
+            current_rep=0,
+            page_title=_("Sit and Reach")
+        )
+    elif mode == "bs":
+        _exercise_overview_screen(
+            _("Back Scratch"),
+            bs_groups,
+            current_rep=0,
+            page_title=_("Back Scratch")
+        )
+
+
+def next_rep_screen(exercise_name, groups, current_rep):
+    """
+    Tela "Próximo" entre repetições — idêntica à intro mas com título 'Next'.
+    current_rep é o índice da próxima repetição a realizar.
+    """
+    _exercise_overview_screen(
+        exercise_name,
+        groups,
+        current_rep=current_rep,
+        page_title=_("Next")
+    )
+
+
+# ══════════════════════════════════════════════
+#  MENU PRINCIPAL  — fiel ao PDF página 2
+# ══════════════════════════════════════════════
+
+def menu_principal():
+    WIN = "CAPACITA"
+    _fullscreen(WIN)
+
+    btn_labels  = [
+        _("Automatic"),
+        _("Sit and Reach"),
+        _("Back Scratch"),
+        _("View Data"),
+        _("End Session"),
+    ]
+    btn_returns = ["auto", "sar", "bs", "data", "quit"]
+
+    hovered = -1
+    clicked = -1
+
+    def mouse_cb(event, x, y, flags, param):
+        nonlocal hovered, clicked
+        hovered = -1
+        for i, (rx1, ry1, rx2, ry2) in enumerate(param["rects"]):
+            if rx1 <= x <= rx2 and ry1 <= y <= ry2:
+                hovered = i
+                break
+        if event == cv2.EVENT_LBUTTONUP and hovered >= 0:
+            clicked = hovered
+
+    rects_ref = {"rects": []}
+    cv2.setMouseCallback(WIN, mouse_cb, rects_ref)
+
+    while True:
+        img = _canvas()
+        content_y = _draw_page_title(img, _("Main Menu"))
+
+        bx1 = S(60);  bx2 = W() - S(60)
+        by1 = content_y; by2 = H() - SH(60)
+        _border_box(img, bx1, by1, bx2, by2)
+
+        n       = len(btn_labels)
+        btn_w   = S(490)
+        btn_h   = SH(72)
+        btn_gap = SH(30)
+        total_h = n * btn_h + (n - 1) * btn_gap
+        start_y = by1 + (by2 - by1 - total_h) // 2
+        cx      = (bx1 + bx2) // 2
+
+        rects = []
+        for i, label in enumerate(btn_labels):
+            rx1 = cx - btn_w // 2
+            rx2 = cx + btn_w // 2
+            ry1 = start_y + i * (btn_h + btn_gap)
+            ry2 = ry1 + btn_h
+            rects.append((rx1, ry1, rx2, ry2))
+
+            col = C_BTN_HOVER if i == hovered else C_PRIMARY
+            cv2.rectangle(img, (rx1, ry1), (rx2, ry2), col, -1)
+            img = put_text_centered(img, label, cx, (ry1 + ry2) // 2, SF(28), C_WHITE)
+
+        rects_ref["rects"] = rects
+
+        cv2.imshow(WIN, img)
+        key = cv2.waitKey(30) & 0xFF
+
+        if clicked >= 0:
+            choice = btn_returns[clicked]
+            clicked = -1
+            cv2.destroyWindow(WIN)
+            return choice
+
+        for i, k in enumerate([ord('1'), ord('2'), ord('3'), ord('4'), ord('5')]):
+            if key == k:
+                cv2.destroyWindow(WIN)
+                return btn_returns[i]
+
+        if key in (13, 10) and hovered >= 0:
+            cv2.destroyWindow(WIN)
+            return btn_returns[hovered]
+
+        if key == 27:
+            cv2.destroyAllWindows()
+            sys.exit(0)
+
+    return "auto"
 
 
 # ══════════════════════════════════════════════
@@ -176,60 +415,55 @@ def intro_screen():
 # ══════════════════════════════════════════════
 
 def grand_finale(sar_right, sar_left, bs_right, bs_left):
-    cv2.namedWindow("Assessment Complete", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Assessment Complete", 900, 600)
-    cv2.moveWindow("Assessment Complete", 500, 200)
+    WIN = "Assessment Complete"
+    _fullscreen(WIN)
 
     while True:
-        img = _capacita_bg()
+        img = _canvas()
+        content_y = _draw_page_title(img, _("Assessment complete") + "!")
 
-        # IPBeja / Operador
-        op_text = "IPBeja / Operador"
-        tw, _ = get_text_size_utf8(op_text, 20)
-        img = put_text_utf8(img, op_text, (900 - tw - 30, 44), font_size=20, color_bgr=C_DARK_TEXT)
-
-        # Título
-        title = _("Assessment complete") + "!"
-        tw2, th2 = get_text_size_utf8(title, 42)
-        img = put_text_utf8(img, title, (60 + 20, 30 + th2), font_size=42, color_bgr=C_PRIMARY)
-        cv2.line(img, (60, 30 + th2 // 2 + 4), (76, 30 + th2 // 2 + 4), C_SUCCESS, 3)
-        cv2.line(img, (80 + tw2 + 12, 30 + th2 // 2 + 4), (840, 30 + th2 // 2 + 4), C_SUCCESS, 3)
-
-        content_top = 30 + th2 + 20
-        cv2.rectangle(img, (60, content_top), (840, 530), C_PRIMARY, 2)
+        bx1 = S(60);  bx2 = W() - S(60)
+        by1 = content_y; by2 = H() - SH(80)
+        _border_box(img, bx1, by1, bx2, by2)
 
         sections = [
             (_("Sit and Reach"), [
-                (f"{_('Best Right Leg')} : {sar_right} cm", C_SECONDARY),
-                (f"{_('Best Left Leg')}  : {sar_left}  cm", C_SECONDARY),
-            ], C_SECONDARY),
-            (_("Back Scratch"), [
-                (f"{_('Best Right Side')}: {bs_right} cm", C_PRIMARY),
-                (f"{_('Best Left Side')} : {bs_left}  cm", C_PRIMARY),
+                (f"{_('Best Right Leg')} :  {sar_right} cm", C_PRIMARY),
+                (f"{_('Best Left Leg')}  :  {sar_left} cm",  C_PRIMARY),
             ], C_PRIMARY),
+            (_("Back Scratch"), [
+                (f"{_('Best Right Side')} :  {bs_right} cm", C_SECONDARY),
+                (f"{_('Best Left Side')}  :  {bs_left} cm",  C_SECONDARY),
+            ], C_SECONDARY),
         ]
 
-        for si, (title_sec, rows, col) in enumerate(sections):
-            base_y = content_top + 20 + si * 200
+        n_sec   = len(sections)
+        sec_h   = SH(200)
+        gap_sec = SH(24)
+        total_h = n_sec * sec_h + (n_sec - 1) * gap_sec
+        sy      = by1 + (by2 - by1 - total_h) // 2
 
-            # Barra de título da secção
-            cv2.rectangle(img, (80, base_y), (820, base_y + 38), col, -1)
-            img = put_text_utf8(img, title_sec,
-                                (96, base_y + 32), font_size=24, color_bgr=C_WHITE)
+        for si, (sec_title, rows, col) in enumerate(sections):
+            base_y = sy + si * (sec_h + gap_sec)
+            sx1 = bx1 + S(20);  sx2 = bx2 - S(20)
+            bar_h = SH(46)
+
+            cv2.rectangle(img, (sx1, base_y), (sx2, base_y + bar_h), col, -1)
+            img = put_text_utf8(img, sec_title,
+                                (sx1 + S(18), base_y + bar_h - SH(8)), SF(26), C_WHITE)
 
             for ri, (text, c) in enumerate(rows):
-                row_y = base_y + 56 + ri * 60
-                cv2.rectangle(img, (80, row_y), (820, row_y + 46), C_WHITE, -1)
-                cv2.rectangle(img, (80, row_y), (820, row_y + 46), col, 1)
-                img = put_text_utf8(img, text, (96, row_y + 40), font_size=22, color_bgr=C_DARK_TEXT)
+                ry1 = base_y + bar_h + ri * SH(70)
+                ry2 = ry1 + SH(62)
+                cv2.rectangle(img, (sx1, ry1), (sx2, ry2), C_WHITE, -1)
+                cv2.rectangle(img, (sx1, ry1), (sx2, ry2), col, S(1))
+                img = put_text_utf8(img, text,
+                                    (sx1 + S(18), ry2 - SH(12)), SF(24), C_DARK_TEXT)
 
-        cv2.line(img, (60, 530), (840, 530), C_GREY, 1)
-        
-        prompt = _('Press  "Q"  to exit')
-        pw, _ = get_text_size_utf8(prompt, 22)
-        img = put_text_utf8(img, prompt, (450 - pw // 2, 575), font_size=22, color_bgr=C_DARK_TEXT)
+        img = put_text_centered(img, _('Press  "Q"  to exit'),
+                                W() // 2, H() - SH(40), SF(22), C_DARK_TEXT)
 
-        cv2.imshow("Assessment Complete", img)
+        cv2.imshow(WIN, img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break
@@ -241,18 +475,17 @@ def grand_finale(sar_right, sar_left, bs_right, bs_left):
 
 def run_and_collect(script_path, keys):
     results = {k: "N/A" for k in keys}
-    # Use line-buffered stdout from child
     proc = subprocess.Popen(
         [sys.executable, "-u", script_path, language],
         stdout=subprocess.PIPE,
-        stderr=None,          # let stderr go to our terminal
+        stderr=None,
         text=True,
         bufsize=1,
     )
     for line in proc.stdout:
         line = line.rstrip()
         if line:
-            print(line)       # echo to our own terminal
+            print(line)
         for k in keys:
             m = re.match(rf"^{k}=(.+)$", line)
             if m:
@@ -272,24 +505,72 @@ if __name__ == "__main__":
     sar_script = os.path.join(base, "Sit-and-Reach", "sit_and_reach_julia.py")
     bs_script  = os.path.join(base, "Back-Scratch",  "back_scratch_julia.py")
 
-    intro_screen()
+    _detect_screen()
 
-    # ── 1. Sit and Reach ──────────────────────
-    print("\n" + "=" * 50)
-    print("  " + _("Starting") + ": " + _("Sit and Reach"))
-    print("=" * 50)
-    sar = run_and_collect(sar_script, ["SAR_RIGHT", "SAR_LEFT"])
-    print("  " + _("Sit and Reach") + " — " + _("Right") + f": {sar['SAR_RIGHT']} cm | " + _("Left") + f": {sar['SAR_LEFT']} cm")
+    # ── Menu ──────────────────────────────────
+    choice = menu_principal()
 
-    # ── 2. Back Scratch ───────────────────────
-    print("\n" + "=" * 50)
-    print("  " + _("Starting") + ": " + _("Back Scratch"))
-    print("=" * 50)
-    bs = run_and_collect(bs_script, ["BS_RIGHT", "BS_LEFT"])
-    print("  " + _("Back Scratch") + " — " + _("Right") + f": {bs['BS_RIGHT']} cm | " + _("Left") + f": {bs['BS_LEFT']} cm")
+    if choice == "quit":
+        sys.exit(0)
+    if choice == "data":
+        df_bs = pd.read_excel('tabelas_utentes/back_scratch_utentes.xlsx', sheet_name='Sheet1')
+        df_sr = pd.read_excel('tabelas_utentes/sit_and_reach_2_utentes.xlsx', sheet_name='Sheet1')
 
-    # ── Grand finale ──────────────────────────
+        print("\n" + "=" * 50)
+        print("  Table Back Scratch  ")
+        print(df_bs)
+        print("=" * 50 + "\n")
+
+        print("\n" + "=" * 50)
+        print("  Tabela Sit and Reach  ")
+        print(df_sr)
+        print("=" * 50 + "\n")
+
+        sys.exit(0)
+
+    sar_groups, bs_groups = _get_groups_for(choice)
+    sar = {"SAR_RIGHT": "N/A", "SAR_LEFT": "N/A"}
+    bs  = {"BS_RIGHT":  "N/A", "BS_LEFT":  "N/A"}
+
+    # ── Sit and Reach ─────────────────────────
+    if choice in ("auto", "sar"):
+        # Tela inicial com bolinhas
+        intro_screen(mode="sar")
+
+        print("\n" + "=" * 50)
+        print("  " + _("Starting") + ": " + _("Sit and Reach"))
+        print("=" * 50)
+
+        total_sar = sum(n for _, n in sar_groups)
+        for rep_idx in range(total_sar):
+            # Entre repetições: mostra "Próximo" com progresso actualizado
+            if rep_idx > 0:
+                next_rep_screen(_("Sit and Reach"), sar_groups, rep_idx)
+
+            # Lança um único exercício passando o índice como argumento extra
+            # O script sit_and_reach_julia.py trata cada repetição individualmente;
+            # o runner invoca-o 4 vezes (comportamento original) mas agora
+            # a tela de transição é mostrada aqui.
+
+        # Corre o script completo (4 reps internas)
+        sar = run_and_collect(sar_script, ["SAR_RIGHT", "SAR_LEFT"])
+        print("  SAR — " + _("Right") + f": {sar['SAR_RIGHT']} cm | "
+              + _("Left") + f": {sar['SAR_LEFT']} cm")
+
+    # ── Back Scratch ──────────────────────────
+    if choice in ("auto", "bs"):
+        intro_screen(mode="bs")
+
+        print("\n" + "=" * 50)
+        print("  " + _("Starting") + ": " + _("Back Scratch"))
+        print("=" * 50)
+
+        bs = run_and_collect(bs_script, ["BS_RIGHT", "BS_LEFT"])
+        print("  BS  — " + _("Right") + f": {bs['BS_RIGHT']} cm | "
+              + _("Left") + f": {bs['BS_LEFT']} cm")
+
+    # ── Grand Finale ──────────────────────────
     grand_finale(sar["SAR_RIGHT"], sar["SAR_LEFT"],
-                 bs["BS_RIGHT"],  bs["BS_LEFT"])
+                 bs["BS_RIGHT"],   bs["BS_LEFT"])
 
     print("\n" + _("Assessment complete") + ". " + _("All data saved") + ".")

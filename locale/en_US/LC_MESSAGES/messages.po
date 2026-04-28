@@ -240,3 +240,18 @@ msgstr "Press  \"Q\"  to finish"
 
 msgid "Exercise not performed correctly"
 msgstr "Exercise not performed correctly"
+
+msgid "Main Menu"
+msgstr "Main Menu"
+
+msgid "Automatic"
+msgstr "Automatic"
+
+msgid "View Data"
+msgstr "View Data"
+
+msgid "End Session"
+msgstr "End Session"
+
+msgid "not implemented yet"
+msgstr "not implemented yet"

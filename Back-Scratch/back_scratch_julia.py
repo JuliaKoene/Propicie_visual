@@ -44,7 +44,6 @@ C_ERROR     = ( 60,  60, 190)
 _font_cache = {}
 
 def get_font(size):
-    """Returns TrueType font from cache or loads if necessary."""
     if size not in _font_cache:
         try:
             _font_cache[size] = ImageFont.truetype(fontFile, size)
@@ -120,7 +119,7 @@ holistic          = mp_holistic.Holistic()
 
 
 # ─────────────────────────────────────────────────────────────────
-#  PROCESS FRAME  (Phase 1 optimization — intacta)
+#  PROCESS FRAME  (Phase 1 optimization)
 # ─────────────────────────────────────────────────────────────────
 def process_frame(kinect):
     frame = kinect.get_last_color_frame()
@@ -285,21 +284,56 @@ def average_distance(distances):
     return sum(distances) / len(distances)
 
 
+def _draw_result_block_colored(img, x1, y1, x2, label, value, value_color):
+    """Como _draw_result_block mas com cor customizada na borda e valor."""
+    bar_h = 38
+    val_h = 52
+    cv2.rectangle(img, (x1, y1), (x2 - 20, y1 + bar_h), C_PRIMARY, -1)
+    img = put_text_utf8(img, label, (x1 + 14, y1 + bar_h - 6), font_size=22, color_bgr=C_WHITE)
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), C_WHITE, -1)
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), value_color, 2)
+    img = put_text_utf8(img, value, (x1 + 14, y1 + bar_h + val_h - 10), font_size=28, color_bgr=value_color)
+    return img
+
+
 def final_repetition_visualization(distance, real_distance,
                                    exercise_label, side_label, rep_num):
+    """
+    Ecrã de repetição concluída. Estilo CAPACITA.
+    Mostra distância do sistema, distância real e diferença com sinal e cor.
+      verde   → diferença < 1 cm
+      laranja → diferença entre 1 e 3 cm
+      vermelho → diferença > 3 cm
+    """
     subtitle = f"{exercise_label}  |  {_('Side')}: {side_label}  |  {_('Rep')} {rep_num}"
-    img = _capacita_bg()
+    img = _capacita_bg(700, 960)
     img, cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Repetition Completed"), subtitle=subtitle)
 
+    fd   = float(distance)
+    rd   = float(real_distance)
+    erro = fd - rd   # com sinal: + sistema mediu a mais, − sistema mediu a menos
+
     img = _draw_result_block(img, cx1, cy1 + 10,  cx2,
-                             _("Distance between both hands"), f"{distance} cm")
-    img = _draw_result_block(img, cx1, cy1 + 130, cx2,
-                             _("Real Distance"), f"{real_distance} cm")
+                             _("System Distance"), f"{fd:+.2f} cm")
+    img = _draw_result_block(img, cx1, cy1 + 110, cx2,
+                             _("Real Distance"),   f"{rd:+.2f} cm")
 
-    prompt = _('Press  "C"  to continue  |  "Q"  to quit')
-    pw, _ = get_text_size_utf8(prompt, 20)
-    img = put_text_utf8(img, prompt, (480 - pw // 2, 570), font_size=20, color_bgr=C_DARK_TEXT)
+    if abs(erro) < 1.0:
+        err_color = C_SUCCESS
+    elif abs(erro) < 3.0:
+        err_color = C_WARN
+    else:
+        err_color = C_ERROR
+    img = _draw_result_block_colored(img, cx1, cy1 + 210, cx2,
+                                     _("Difference (System − Real)"),
+                                     f"{erro:+.2f} cm", err_color)
 
+    pw, _h = get_text_size_utf8(_('Press  "C"  to continue  |  "Q"  to quit'), 20)
+    img = put_text_utf8(img, _('Press  "C"  to continue  |  "Q"  to quit'),
+                        (480 - pw // 2, 650), font_size=20, color_bgr=C_DARK_TEXT)
+
+    cv2.namedWindow("Repetition Results", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("Repetition Results", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.imshow("Repetition Results", img)
     while True:
         key = cv2.waitKey(0) & 0xFF
@@ -314,14 +348,16 @@ def final_visualization(left, right):
     img, cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Exercise Completed"))
 
     img = _draw_result_block(img, cx1, cy1 + 10,  cx2,
-                             _("Best result of the right side"), f"{right} cm")
+                             _("Best result of the right side"), f"{float(right):+.2f} cm")
     img = _draw_result_block(img, cx1, cy1 + 130, cx2,
-                             _("Best result of the left side"),  f"{left} cm")
+                             _("Best result of the left side"),  f"{float(left):+.2f} cm")
 
-    prompt = _('Press  "Q"  to finish')
-    pw, _ = get_text_size_utf8(prompt, 20)
-    img = put_text_utf8(img, prompt, (480 - pw // 2, 570), font_size=20, color_bgr=C_DARK_TEXT)
+    pw, _h = get_text_size_utf8(_('Press  "Q"  to finish'), 20)
+    img = put_text_utf8(img, _('Press  "Q"  to finish'),
+                        (480 - pw // 2, 570), font_size=20, color_bgr=C_DARK_TEXT)
 
+    cv2.namedWindow("Final Results", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("Final Results", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.imshow("Final Results", img)
     while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -368,7 +404,7 @@ def register():
 
     win_title = _("Registration")
     cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(win_title, 840, 700)
+    cv2.setWindowProperty(win_title, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.setMouseCallback(win_title, mouse_callback)
 
     while True:
@@ -413,7 +449,7 @@ def real_distance():
     distancia = ""
     win_title = _("Real Distance")
     cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(win_title, 700, 420)
+    cv2.setWindowProperty(win_title, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     while True:
         img = _capacita_bg(420, 700)
@@ -508,6 +544,8 @@ def process_exercise(repeats):
             image = draw_header(image, _("Back Scratch"), side_label, rep_num, 2)
             image = draw_calibration_legend(image, calib_state)
 
+            cv2.namedWindow('Left Hand Tracking with Kinect and Holistic', cv2.WINDOW_NORMAL)
+            cv2.setWindowProperty('Left Hand Tracking with Kinect and Holistic', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
             cv2.imshow('Left Hand Tracking with Kinect and Holistic', image)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 finish_program()
@@ -531,14 +569,15 @@ while repeats < 4:
 
     if final_distance is not None:
         real = real_distance()
-        erro = np.abs(np.abs(float(real)) - np.abs(float(final_distance)))
+        erro = float(final_distance) - float(real)   # com sinal: + sistema mediu a mais
 
         caminho_arquivo = "./tabelas_utentes/back_scratch_utentes.xlsx"
         df = pd.read_excel(caminho_arquivo, engine="openpyxl")
 
         new_line = {
             "Age": age, "Height": height, "Weight": weight, "Gender": gender,
-            "Real distance": real, "Calculated distance": final_distance, "Erro": erro
+            "Real distance": real, "Calculated distance": final_distance,
+            "Difference (System-Real)": erro
         }
         df = pd.concat([df, pd.DataFrame([new_line])], ignore_index=True)
         df.to_excel(caminho_arquivo, index=False, engine="openpyxl")

@@ -539,22 +539,23 @@ def check_posture(pose_correct_start_time, knee_angle, opposite_knee_angle, hip_
 # ─────────────────────────────────────────────────────────────────
 
 def final_visualization(left, right):
-    """Ecrã final com resultados. Dois blocos de resultado estilo CAPACITA."""
+    """Ecrã final com resultados. Valores com sinal explícito."""
     img = _capacita_bg(600, 960)
     cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Exercise Completed"))
 
     # Bloco 1
     _draw_result_block(img, cx1, cy1 + 10,  cx2,
-                       _("Best result of the right leg"), f"{left} cm")
+                       _("Best result of the right leg"), f"{float(left):+.2f} cm")
     # Bloco 2
     _draw_result_block(img, cx1, cy1 + 130, cx2,
-                       _("Best result of the left leg"),  f"{right} cm")
+                       _("Best result of the left leg"),  f"{float(left):+.2f} cm")
 
-    # Prompt
     prompt = _('Press  "Q"  to finish')
-    pw, _ = get_text_size_utf8(prompt, 20)
+    pw, _h = get_text_size_utf8(prompt, 20)
     put_text_utf8(img, prompt, (480 - pw // 2, 555), font_size=20, color=C_DARK_TEXT)
 
+    cv2.namedWindow(_("Final Results"), cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty(_("Final Results"), cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.imshow(_("Final Results"), img)
     while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -575,22 +576,56 @@ def _draw_result_block(img, x1, y1, x2, label, value):
     put_text_utf8(img, value, (x1 + 14, y1 + bar_h + 10), font_size=28, color=C_DARK_TEXT)
 
 
+def _draw_result_block_colored(img, x1, y1, x2, label, value, value_color):
+    """Como _draw_result_block mas com cor customizada na borda e valor."""
+    bar_h = 38
+    val_h = 52
+    cv2.rectangle(img, (x1, y1), (x2 - 20, y1 + bar_h), C_PRIMARY, -1)
+    put_text_utf8(img, label, (x1 + 14, y1 + 6), font_size=22, color=C_WHITE)
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), C_WHITE, -1)
+    cv2.rectangle(img, (x1, y1 + bar_h), (x2 - 20, y1 + bar_h + val_h), value_color, 2)
+    put_text_utf8(img, value, (x1 + 14, y1 + bar_h + 10), font_size=28, color=value_color)
+
+
 def final_repetition_visualization(final_distance, real_dist,
                                    exercise_label, side_label, rep_num):
-    """Ecrã de repetição concluída. Estilo CAPACITA."""
+    """
+    Ecrã de repetição concluída. Estilo CAPACITA.
+    Mostra distância do sistema, distância real e diferença com sinal e cor.
+      verde  → diferença < 1 cm
+      laranja → diferença entre 1 e 3 cm
+      vermelho → diferença > 3 cm
+    """
     subtitle = f"{exercise_label}  |  {_('Side')}: {side_label}  |  {_('Rep')} {rep_num}"
-    img = _capacita_bg(600, 960)
+    img = _capacita_bg(700, 960)
     cx1, cy1, cx2, cy2 = _draw_capacita_frame(img, _("Repetition Completed"), subtitle=subtitle)
 
+    fd   = float(final_distance)
+    rd   = float(real_dist)
+    erro = fd - rd   # com sinal: + sistema mediu a mais, − sistema mediu a menos
+
     _draw_result_block(img, cx1, cy1 + 10,  cx2,
-                       _("Final Distance"),  f"{final_distance} cm")
-    _draw_result_block(img, cx1, cy1 + 130, cx2,
-                       _("Real Distance"),   f"{real_dist} cm")
+                       _("System Distance"),  f"{fd:+.2f} cm")
+    _draw_result_block(img, cx1, cy1 + 110, cx2,
+                       _("Real Distance"),    f"{rd:+.2f} cm")
+
+    # Bloco de diferença com cor condicional
+    if abs(erro) < 1.0:
+        err_color = C_SUCCESS
+    elif abs(erro) < 3.0:
+        err_color = C_WARN
+    else:
+        err_color = C_ERROR
+    _draw_result_block_colored(img, cx1, cy1 + 210, cx2,
+                               _("Difference (System − Real)"),
+                               f"{erro:+.2f} cm", err_color)
 
     prompt = _('Press  "C"  to continue  |  "Q"  to quit')
-    pw, _ = get_text_size_utf8(prompt, 20)
-    put_text_utf8(img, prompt, (480 - pw // 2, 555), font_size=20, color=C_DARK_TEXT)
+    pw, _h = get_text_size_utf8(prompt, 20)
+    put_text_utf8(img, prompt, (480 - pw // 2, 650), font_size=20, color=C_DARK_TEXT)
 
+    cv2.namedWindow(_("Final Repetition Results"), cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty(_("Final Repetition Results"), cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.imshow(_("Final Repetition Results"), img)
     while True:
         key = cv2.waitKey(1) & 0xFF
@@ -626,7 +661,7 @@ def register():
 
     win_title = _("Registration")
     cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(win_title, 840, 700)
+    cv2.setWindowProperty(win_title, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.setMouseCallback(win_title, mouse_callback)
 
     while True:
@@ -678,7 +713,7 @@ def real_distance():
     distancia = ""
     win_title = _("Real Distance")
     cv2.namedWindow(win_title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(win_title, 700, 420)
+    cv2.setWindowProperty(win_title, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     while True:
         img = _capacita_bg(420, 700)
@@ -800,6 +835,8 @@ def process_exercise(repeats):
             draw_header(image, _("Sit and Reach"), side_label, rep_num, 2)
             draw_calibration_legend(image, calibration)
 
+            cv2.namedWindow("MediaPipe Holistic", cv2.WINDOW_NORMAL)
+            cv2.setWindowProperty("MediaPipe Holistic", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
             cv2.imshow("MediaPipe Holistic", image)
             if cv2.waitKey(1) & 0xFF in (ord('q'), ord('Q')):
                 finish_program()
@@ -829,11 +866,12 @@ while repeats < 4:
         df   = pd.read_excel(caminho_arquivo, engine="openpyxl")
         real = real_distance()
 
-        erro = np.abs(np.abs(float(real)) - np.abs(float(final_distance)))
+        erro = float(final_distance) - float(real)
 
         new_line = {
             "Age": age, "Height": height, "Weight": weight, "Gender": gender,
-            "Real distance": real, "Calculated distance": final_distance, "Erro": erro
+            "Real distance": real, "Calculated distance": final_distance,
+            "Difference (System-Real)": erro
         }
         df = pd.concat([df, pd.DataFrame([new_line])], ignore_index=True)
         df.to_excel(caminho_arquivo, index=False, engine="openpyxl")
@@ -863,4 +901,4 @@ print(f"SAR_RIGHT={best_right}")
 print(f"SAR_LEFT={best_left}")
 sys.stdout.flush()
 
-final_visualization(best_left, best_right)
+final_visualization(best_left, best_right)  

@@ -7,7 +7,7 @@
 
 O sistema original para a avaliação automatizada de testes de aptidão física da Bateria de Fullerton, projetado para apoiar o envelhecimento ativo. Este projeto utiliza visão computacional com um sensor Kinect V2 e a biblioteca MediaPipe Holistic do Google para fornecer medições precisas e em tempo real.
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
 Sendo o original: https://github.com/vgguerra/Propicie
 
@@ -19,7 +19,7 @@ O núcleo do projeto é uma aplicação em Python que utiliza um sensor Kinect V
 
 **Foram adicionados visuais para facilitar seu uso tando para quem administrar os testes e quem está o realizando.**
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 * **Avaliação em Tempo Real**: Análise automatizada dos exercícios "Sentar e Alcançar" e "Coçar as Costas".
 * **Rastreamento de Alta Precisão**: Utiliza o MediaPipe Holistic para um rastreamento robusto e em tempo real de 33 marcos de pose, além de marcos detalhados das mãos.
@@ -29,7 +29,7 @@ O núcleo do projeto é uma aplicação em Python que utiliza um sensor Kinect V
 * **Análise Estatística**: Inclui scripts em Python para analisar os dados coletados e calcular estatísticas-chave sobre o erro de medição.
 * **Feedback em Tempo Real**: Fornece visualizações na tela do esqueleto, métricas-chave e instruções para guiar o usuário.
 
-## 🛠️ Como Funciona
+## Como Funciona
 
 O sistema segue um fluxo de trabalho claro para cada avaliação:
 1.  **Cadastro do Usuário**: O usuário insere seus dados demográficos.
@@ -41,7 +41,7 @@ O sistema segue um fluxo de trabalho claro para cada avaliação:
 5.  **Medição da Distância**: A distância euclidiana entre os marcos-chave (por exemplo, pontas dos dedos até a posição calibrada do pé, ou pontas dos dedos de uma mão para a outra) é calculada em pixels e convertida para centímetros. Um fator de correção de erro, derivado de testes empíricos, é aplicado para aumentar a precisão.
 6.  **Exibição e Registro dos Resultados**: A distância final calculada é exibida na tela, e os resultados completos são salvos em um arquivo de log e em uma planilha Excel para o grupo de usuários.
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 * **Linguagem**: **Python 3.8+**
 * **Visão Computacional**: **OpenCV**, **MediaPipe Holistic**
@@ -50,7 +50,7 @@ O sistema segue um fluxo de trabalho claro para cada avaliação:
 * **Manipulação e Análise de Dados**: **Pandas**, **NumPy**
 * **Orquestração**: Os scripts podem ser executados diretamente com Python (`runner.py`) ou através de um **Runner em C# .NET** (`CsRunner/`).
 
-## ⚙️ Configuração e Instalação
+## Configuração e Instalação
 
 Para executar este projeto, siga os passos abaixo.
 
@@ -88,7 +88,14 @@ Para executar este projeto, siga os passos abaixo.
         ```
     * Se encontrar problemas, pode ser necessário instalar o `comtypes`.
 
-## ▶️ Uso
+5. **Para Alterrações no .po com as Linguagens**:
+    *Rode o seguinte comando sempre que os arquivos .po forem alterados.
+        ```bash
+        python -m babel.messages.frontend compile -i locale\en_US\LC_MESSAGES\messages.po -o locale\en_US\LC_MESSAGES\messages.mo
+        python -m babel.messages.frontend compile -i locale\pt_PT\LC_MESSAGES\messages.po -o locale\pt_PT\LC_MESSAGES\messages.mo
+        ´´´
+        
+## Uso
 
 Após a conclusão da configuração, você pode executar as avaliações.
 
@@ -100,13 +107,14 @@ python runner_2.py
 ```
 
 ### O Processo
-1.  Quando um script é iniciado, uma janela aparecerá solicitando as informações do usuário (Idade, Altura, Peso, Gênero). Preencha os campos e pressione `Enter`.
-2.  Em seguida, uma janela solicitará a distância real medida. Isso é usado para validação e cálculo de erro. Insira o valor e pressione `Enter`.
+1.  Quando um script é iniciado, uma janela de menu aparecerá sendo possível escolher entre *Automático*, que rodará Sit and Reach e logo em seguida Back Scratch, *Sit and Reach* ou *Back Scratch*, que rodarão somente seus respectivos exercícios, *Visualizar Dados*, que mostrará ambas as planilhas com os dados já coletados.
+2.  Quando iniciar um dos exercícios, será mostrado uma tela com os exercícios ainda para fazer e os já feitos, marcados com bolinha (realizando em seguida) e ou x (realizado). Antes de iniciar um tipo diferentes de exercício será solicitado as informações do usuário (Idade, Altura, Peso, Gênero). Preencha os campos e pressione `Enter`.
 3.  A janela principal da aplicação será aberta, mostrando o feed da câmera do Kinect com a sobreposição do esqueleto do MediaPipe.
-4.  Siga as instruções na tela para se posicionar corretamente.
-5.  O sistema detectará automaticamente quando você estiver na postura correta, manterá a pose e, em seguida, calculará o resultado.
-6.  O resultado será exibido, e você será solicitado a continuar (`c`) ou sair (`q`).
-
+4.  Em seguida, será realizado o exercício, perceba na tela qual o lado e qual a repetição, após a realização de cada repetição uma janela solicitará a distância real medida. Isso é usado para validação e cálculo de erro. Insira o valor e pressione `Enter`.
+5.  A posição correta para *Sit and Reach*: a cadeira deve estar virada 90° do kinect, em 1.5 a 2 metros de distância, deve-se sentar na ponta da cadeira, dobrar a perna pro lado aposto ao kinect a 90°, e a perna pro lado do kinect deve ficar esticada a frente com o calcanhar no chão e a ponta do pé levantada. Para calibração será necessário ficar nessa posição e virar o tronco parcialmente para o kinect levantando as duas mãos viradas a ele na altura da cabeça. Quando a calibração disser OK pode fazer o exercício, segure a posição até o pop-up de medida real aparecer.
+6.  A posição correta para *Back Scratch*: a 1.5m - 2m do kinect vire de costas e coloque a mão de cima do exercício de acordo com a mão instruída no exercício, lado direito, mão direita em cima. Não segure uma mão na outra, tente manter as mãos retas nas costas. Não há calibração, somente segure a pose até o pop-up da medição real aparecer.
+7.  O resultado será exibido, e você será solicitado a continuar (`c`) ou sair (`q`).
+8.  Os dados só serão salvos nas planilhas se o exercício for feito até o final.
 
 
 * Este trabalho faz parte de uma colaboração de pesquisa entre o **Instituto Politécnico de Beja (IPBeja)** e o **Instituto Federal de Santa Catarina (IFSC)**.

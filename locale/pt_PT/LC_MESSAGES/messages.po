@@ -240,3 +240,18 @@ msgstr "Prima Q para finalizar"
 
 msgid "Exercise not performed correctly"
 msgstr "Exercício não efetuado corretamente"
+
+msgid "Main Menu"
+msgstr "Menu Principal"
+
+msgid "Automatic"
+msgstr "Automático"
+
+msgid "View Data"
+msgstr "Visualizar Dados"
+
+msgid "End Session"
+msgstr "Terminar Sessão"
+
+msgid "not implemented yet"
+msgstr "ainda não implementado"
