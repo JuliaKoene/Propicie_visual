@@ -255,3 +255,18 @@ msgstr "End Session"
 
 msgid "not implemented yet"
 msgstr "not implemented yet"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Right Side"
+msgstr "Right Side"
+
+msgid "Left Side"
+msgstr "Left Side"
+
+msgid "System Distance"
+msgstr "System Distance"
+
+msgid "Difference (System − Real)"
+msgstr "Difference (System − Real)"
