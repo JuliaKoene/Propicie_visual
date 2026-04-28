@@ -100,7 +100,7 @@ Para executar este projeto, siga os passos abaixo.
 Após a conclusão da configuração, você pode executar as avaliações.
 
 ### Executando a Suíte de Testes Completa
-Você pode executar os testes de Sentar e Alcançar e de Coçar as Costas sequencialmente usando o script de execução fornecido.
+Para inicinar o programa rode no *Anaconda Prompt*:
 
 ```bash
 python runner_2.py
