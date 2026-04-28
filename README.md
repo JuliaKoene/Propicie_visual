@@ -93,7 +93,7 @@ Para executar este projeto, siga os passos abaixo.
         ```bash
         python -m babel.messages.frontend compile -i locale\en_US\LC_MESSAGES\messages.po -o locale\en_US\LC_MESSAGES\messages.mo
         python -m babel.messages.frontend compile -i locale\pt_PT\LC_MESSAGES\messages.po -o locale\pt_PT\LC_MESSAGES\messages.mo
-        ´´´
+        ```
         
 ## Uso
 
